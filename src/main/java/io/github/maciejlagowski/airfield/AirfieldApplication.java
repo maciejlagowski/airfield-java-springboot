@@ -10,7 +10,9 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.Month;
 import java.util.stream.Stream;
 
@@ -32,8 +34,9 @@ public class AirfieldApplication {
             Stream.of(userRepository.findAll()).forEach(user -> {
                 reservationRepository.save(new Reservation(
                         0L,
-                        LocalDateTime.of(2020, Month.MARCH, 1, 1, 1),
-                        LocalDateTime.of(2020, Month.MARCH, 1, 2, 2),
+                        LocalDate.of(2020, 2, 2),
+                        LocalTime.of(8, 0),
+                        LocalTime.of(11, 0),
                         user.iterator().next(),
                         ReservationType.FLIGHT
                 ));

@@ -4,6 +4,7 @@ import io.github.maciejlagowski.airfield.model.dto.ReservationDTO;
 import io.github.maciejlagowski.airfield.model.entity.Reservation;
 import io.github.maciejlagowski.airfield.model.entity.User;
 import io.github.maciejlagowski.airfield.model.repository.UserRepository;
+import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -12,15 +13,16 @@ import java.util.List;
 import java.util.NoSuchElementException;
 
 @Service
+@AllArgsConstructor
 public class ReservationService {
 
-    @Autowired
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
 
     public ReservationDTO constructFromEntity(Reservation reservation) {
         return ReservationDTO.builder()
-                .startDate(reservation.getStartDate())
-                .endDate(reservation.getEndDate())
+                .date(reservation.getDate())
+                .startTime(reservation.getStartTime())
+                .endTime(reservation.getEndTime())
                 .name(reservation.getUser().getName())
                 .telephone(reservation.getUser().getEmail())    //TODO TELEPHONE
                 .reservationType(reservation.getReservationType())
@@ -43,8 +45,9 @@ public class ReservationService {
             User user = userRepository.findById(reservationDTO.getUserId()).orElseThrow();
             reservation = new Reservation(
                     0,
-                    reservationDTO.getStartDate(),
-                    reservationDTO.getEndDate(),
+                    reservationDTO.getDate(),
+                    reservationDTO.getStartTime(),
+                    reservationDTO.getEndTime(),
                     user,
                     reservationDTO.getReservationType()
             );
