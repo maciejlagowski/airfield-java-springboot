@@ -14,6 +14,13 @@ public class UserController {
 
     private final UserRepository userRepository;
 
+    @GetMapping("/login")
+    public boolean login(@RequestParam User user) {
+        System.out.println("got login" + user);
+        return user.getName().equals("root")    // TODO
+                && user.getPassword().equals("maciek");
+    }
+
     @GetMapping("/users")
     public List<User> getUsers() {
         return (List<User>) userRepository.findAll();

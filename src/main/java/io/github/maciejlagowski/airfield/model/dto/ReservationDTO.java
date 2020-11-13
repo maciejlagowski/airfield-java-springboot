@@ -2,6 +2,7 @@ package io.github.maciejlagowski.airfield.model.dto;
 
 import io.github.maciejlagowski.airfield.model.entity.Reservation;
 import io.github.maciejlagowski.airfield.model.enumeration.ReservationType;
+import io.github.maciejlagowski.airfield.model.enumeration.Status;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -24,4 +25,5 @@ public class ReservationDTO {
     private ReservationType reservationType;
     private Long userId;
     private Long reservationId;
+    private Status status;
 }

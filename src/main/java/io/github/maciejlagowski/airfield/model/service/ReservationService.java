@@ -24,7 +24,7 @@ public class ReservationService {
                 .startTime(reservation.getStartTime())
                 .endTime(reservation.getEndTime())
                 .name(reservation.getUser().getName())
-                .telephone(reservation.getUser().getEmail())    //TODO TELEPHONE
+                .telephone(reservation.getUser().getPhoneNumber())
                 .reservationType(reservation.getReservationType())
                 .userId(reservation.getUser().getId())
                 .reservationId(reservation.getId())
@@ -41,6 +41,7 @@ public class ReservationService {
 
     public Reservation createReservation(ReservationDTO reservationDTO) throws NoSuchElementException {
         Reservation reservation;
+        System.err.println(reservationDTO);
         try {
             User user = userRepository.findById(reservationDTO.getUserId()).orElseThrow();
             reservation = new Reservation(
@@ -49,7 +50,8 @@ public class ReservationService {
                     reservationDTO.getStartTime(),
                     reservationDTO.getEndTime(),
                     user,
-                    reservationDTO.getReservationType()
+                    reservationDTO.getReservationType(),
+                    reservationDTO.getStatus()
             );
         } catch (NoSuchElementException e) {
             //TODO ERROR
