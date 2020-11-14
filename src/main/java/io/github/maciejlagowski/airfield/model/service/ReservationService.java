@@ -5,7 +5,6 @@ import io.github.maciejlagowski.airfield.model.entity.Reservation;
 import io.github.maciejlagowski.airfield.model.entity.User;
 import io.github.maciejlagowski.airfield.model.repository.UserRepository;
 import lombok.AllArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.LinkedList;
@@ -34,9 +33,7 @@ public class ReservationService {
 
     public List<ReservationDTO> reservationListToDTOList(List<Reservation> reservations) {
         List<ReservationDTO> dtoList = new LinkedList<>();
-        reservations.forEach(reservation -> {
-            dtoList.add(constructFromEntity(reservation));
-        });
+        reservations.forEach(reservation -> dtoList.add(constructFromEntity(reservation)));
         return dtoList;
     }
 

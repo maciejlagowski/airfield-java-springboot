@@ -2,14 +2,13 @@ package io.github.maciejlagowski.airfield.controller;
 
 import io.github.maciejlagowski.airfield.model.dto.ReservationDTO;
 import io.github.maciejlagowski.airfield.model.entity.Reservation;
+import io.github.maciejlagowski.airfield.model.enumeration.Status;
 import io.github.maciejlagowski.airfield.model.repository.ReservationRepository;
 import io.github.maciejlagowski.airfield.model.service.ReservationService;
 import lombok.Data;
-import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
-import java.util.Date;
 import java.util.List;
 
 @RestController
@@ -31,5 +30,9 @@ public class ReservationController {
         Reservation reservation = reservationService.createReservation(reservationDTO);
         reservationRepository.saveWithHoursCheck(reservation, reservationRepository);
     }
-}
 
+    @PatchMapping("/reservations")
+    void changeReservationStatus(@RequestParam Long id, @RequestParam Status status) {
+        reservationRepository.updateStatus(id, status);
+    }
+}

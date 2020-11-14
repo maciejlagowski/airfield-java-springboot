@@ -1,6 +1,5 @@
 package io.github.maciejlagowski.airfield.model.entity;
 
-import com.sun.istack.NotNull;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
