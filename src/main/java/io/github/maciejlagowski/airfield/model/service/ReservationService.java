@@ -28,6 +28,7 @@ public class ReservationService {
                 .reservationType(reservation.getReservationType())
                 .userId(reservation.getUser().getId())
                 .reservationId(reservation.getId())
+                .status(reservation.getStatus())
                 .build();
     }
 
@@ -50,9 +51,9 @@ public class ReservationService {
                     reservationDTO.getStartTime(),
                     reservationDTO.getEndTime(),
                     user,
-                    reservationDTO.getReservationType(),
-                    reservationDTO.getStatus()
-            );
+                    reservationDTO.getStatus(),
+                    reservationDTO.getReservationType()
+                    );
         } catch (NoSuchElementException e) {
             //TODO ERROR
             e.printStackTrace();

@@ -48,8 +48,8 @@ public class AirfieldApplication {
                             LocalTime.of(timeIterator, 0),
                             LocalTime.of(++timeIterator, 0),
                             user,
-                            ReservationType.rand(),
-                            Status.rand()
+                            Status.rand(),
+                            ReservationType.rand()
                     ));
                     timeIterator += new Random().nextInt(3);
                 }

@@ -22,8 +22,8 @@ public class ReservationController {
 
     @GetMapping("/reservations")
     public List<ReservationDTO> getReservations(@RequestParam String date) {
-        return reservationService.reservationListToDTOList((List<Reservation>) reservationRepository.
-                findAllByDateOrderByStartTime(LocalDate.parse(date)));
+        List<Reservation> reservations = reservationRepository.findAllByDateOrderByStartTime(LocalDate.parse(date));
+        return reservationService.reservationListToDTOList(reservations);
     }
 
     @PostMapping("/reservations")

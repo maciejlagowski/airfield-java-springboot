@@ -2,6 +2,7 @@ package io.github.maciejlagowski.airfield.model.entity;
 
 import io.github.maciejlagowski.airfield.model.enumeration.ReservationType;
 import io.github.maciejlagowski.airfield.model.enumeration.Status;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -12,6 +13,7 @@ import java.time.LocalTime;
 @Entity
 @Data
 @NoArgsConstructor
+@AllArgsConstructor
 public class Reservation {
 
     @Id
@@ -25,22 +27,22 @@ public class Reservation {
     private LocalTime endTime;
     @ManyToOne
     private User user;
-    private ReservationType reservationType;
     private Status status;
+    private ReservationType reservationType;
     // TODO NotNull not nullable
 
-    public Reservation(long id, LocalDate date, LocalTime startTime, LocalTime endTime, User user, ReservationType reservationType, Status status) {
-        if (endTime.isBefore(startTime)) {
-            throw new IllegalArgumentException("End time cannot be earlier than start time");
-        }
-        this.id = id;
-        this.date = date;
-        this.startTime = startTime;
-        this.endTime = endTime;
-        this.user = user;
-        this.reservationType = reservationType;
-        this.status = status;
-    }
+//    public Reservation(long id, LocalDate date, LocalTime startTime, LocalTime endTime, User user, ReservationType reservationType, Status status) {
+//        if (endTime.isBefore(startTime)) {
+//            throw new IllegalArgumentException("End time cannot be earlier than start time");
+//        }
+//        this.id = id;
+//        this.date = date;
+//        this.startTime = startTime;
+//        this.endTime = endTime;
+//        this.user = user;
+//        this.reservationType = reservationType;
+//        this.status = status;
+//    }
 
     public boolean collides(Reservation reservation) {
         return (this.startTime.isAfter(reservation.startTime) && this.startTime.isBefore(reservation.endTime)) ||
