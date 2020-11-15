@@ -17,7 +17,7 @@ public class UserController {
 //    @GetMapping("/login")
 //    public boolean login(@RequestParam User user) {
 //        System.out.println("got login" + user);
-//        return user.getName().equals("root")    // TODO
+//        return user.getName().equals("root")    // TODO login
 //                && user.getPassword().equals("maciek");
 //    }
 

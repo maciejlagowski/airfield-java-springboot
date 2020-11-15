@@ -31,3 +31,6 @@ build/
 
 ### VS Code ###
 .vscode/
+
+### spring properties with api keys ###
+src/main/resources/application.properties
