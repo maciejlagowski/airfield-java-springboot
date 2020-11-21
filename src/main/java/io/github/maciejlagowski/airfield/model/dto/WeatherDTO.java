@@ -37,9 +37,4 @@ public class WeatherDTO {
     private String descriptionWeather;
     private Long clouds;
     private Double pop;
-    private boolean failed = false;
-
-    public WeatherDTO(boolean failed) {
-        this.failed = failed;
-    }
 }

@@ -31,7 +31,7 @@ public class WeatherApiService {
     }
 
     @Bean
-    public void updateWeather() throws JsonProcessingException { // TODO switch to real API
+    public void updateWeather() throws JsonProcessingException { // TODO switch to real API, updating every hour?
 //        String result = restTemplate.getForObject(url + apiKey, String.class);
         String result = getFakeApi();
         ObjectMapper objectMapper = new ObjectMapper();

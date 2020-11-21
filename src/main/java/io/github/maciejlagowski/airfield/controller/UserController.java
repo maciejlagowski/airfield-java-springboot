@@ -3,6 +3,7 @@ package io.github.maciejlagowski.airfield.controller;
 import io.github.maciejlagowski.airfield.model.entity.User;
 import io.github.maciejlagowski.airfield.model.repository.UserRepository;
 import lombok.Data;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -22,11 +23,13 @@ public class UserController {
 //    }
 
     @GetMapping("/users")
+    @ResponseStatus(HttpStatus.OK)
     public List<User> getUsers() {
         return (List<User>) userRepository.findAll();
     }
 
     @PostMapping("/users")
+    @ResponseStatus(HttpStatus.OK)
     void addUser(@RequestBody User user) {
         userRepository.save(user);
     }
