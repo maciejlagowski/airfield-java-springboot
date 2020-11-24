@@ -1,17 +1,23 @@
 package io.github.maciejlagowski.airfield.model.entity;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Data
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class User {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
     private String name;
     private String password;
@@ -19,14 +25,6 @@ public class User {
     private String phoneNumber;
     private boolean isEmployee;
 
-    public User(String name, String phoneNumber, String password) {
-        this.name = name;
-        this.phoneNumber = phoneNumber;
-        this.password = password;
-    }
-
-    public User(String name, String phoneNumber) {
-        this.name = name;
-        this.phoneNumber = phoneNumber;
-    }
+    @ManyToMany(fetch = FetchType.LAZY)
+    private Set<Role> roles = new HashSet<>();
 }

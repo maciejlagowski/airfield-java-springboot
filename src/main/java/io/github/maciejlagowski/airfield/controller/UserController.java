@@ -15,12 +15,18 @@ public class UserController {
 
     private final UserRepository userRepository;
 
-//    @GetMapping("/login")
-//    public boolean login(@RequestParam User user) {
-//        System.out.println("got login" + user);
-//        return user.getName().equals("root")    // TODO login
-//                && user.getPassword().equals("maciek");
-//    }
+    @GetMapping("/login")
+    public boolean login(@RequestParam User user) {
+        System.out.println("got login" + user);
+        return user.getName().equals("root")    // TODO login
+                && user.getPassword().equals("maciek");
+    }
+
+    @PostMapping("/register")
+    public void register(@RequestBody User user) {
+        System.out.println("got reg req " + user);
+
+    }
 
     @GetMapping("/users")
     @ResponseStatus(HttpStatus.OK)
