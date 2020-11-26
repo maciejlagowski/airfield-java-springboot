@@ -1,7 +1,7 @@
 package io.github.maciejlagowski.airfield.model.repository;
 
 import io.github.maciejlagowski.airfield.model.entity.Reservation;
-import io.github.maciejlagowski.airfield.model.enumeration.Status;
+import io.github.maciejlagowski.airfield.model.enumeration.EStatus;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
@@ -30,6 +30,6 @@ public interface ReservationRepository extends CrudRepository<Reservation, Long>
 
     @Modifying
     @Query("update Reservation r set r.status = :status where r.id = :id")
-    void updateStatus(@Param(value = "id") long id, @Param(value = "status") Status status);
+    void updateStatus(@Param(value = "id") long id, @Param(value = "status") EStatus status);
 
 }

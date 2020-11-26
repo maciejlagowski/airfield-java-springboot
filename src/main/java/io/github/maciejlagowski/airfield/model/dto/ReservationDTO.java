@@ -1,7 +1,7 @@
 package io.github.maciejlagowski.airfield.model.dto;
 
-import io.github.maciejlagowski.airfield.model.enumeration.ReservationType;
-import io.github.maciejlagowski.airfield.model.enumeration.Status;
+import io.github.maciejlagowski.airfield.model.enumeration.EReservationType;
+import io.github.maciejlagowski.airfield.model.enumeration.EStatus;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -20,8 +20,8 @@ public class ReservationDTO {
     private LocalTime endTime;
     private String name;
     private String telephone;
-    private ReservationType reservationType;
+    private EReservationType reservationType;
     private Long userId;
     private Long reservationId;
-    private Status status;
+    private EStatus status;
 }

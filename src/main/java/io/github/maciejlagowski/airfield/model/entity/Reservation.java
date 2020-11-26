@@ -1,7 +1,7 @@
 package io.github.maciejlagowski.airfield.model.entity;
 
-import io.github.maciejlagowski.airfield.model.enumeration.ReservationType;
-import io.github.maciejlagowski.airfield.model.enumeration.Status;
+import io.github.maciejlagowski.airfield.model.enumeration.EReservationType;
+import io.github.maciejlagowski.airfield.model.enumeration.EStatus;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -27,8 +27,8 @@ public class Reservation {
     private LocalTime endTime;
     @ManyToOne
     private User user;
-    private Status status;
-    private ReservationType reservationType;
+    private EStatus status;
+    private EReservationType reservationType;
     // TODO NotNull not nullable
 
 //    public Reservation(long id, LocalDate date, LocalTime startTime, LocalTime endTime, User user, ReservationType reservationType, Status status) {

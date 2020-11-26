@@ -36,11 +36,11 @@ public class WeatherApiService {
         String result = getFakeApi();
         ObjectMapper objectMapper = new ObjectMapper();
         weather = objectMapper.readValue(result, WeatherApiResponse.class);
-        if (weather.getZone().equals(ZoneId.systemDefault())) {
-            System.out.println("Weather updated");
-        } else {
-            throw new ZoneRulesException("Timezones from api and system are different");
-        }
+//        if (weather.getZone().equals(ZoneId.systemDefault())) {
+//            System.out.println("Weather updated");
+//        } else {
+//            throw new ZoneRulesException("Timezones from api and system are different");
+//        }
     }
 
     public WeatherDTO getWeatherOnDay(LocalDateTime date) throws NotFoundException {

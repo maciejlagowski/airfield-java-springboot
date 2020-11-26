@@ -4,6 +4,7 @@ import io.github.maciejlagowski.airfield.model.entity.User;
 import io.github.maciejlagowski.airfield.model.repository.UserRepository;
 import lombok.Data;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -15,20 +16,21 @@ public class UserController {
 
     private final UserRepository userRepository;
 
-    @GetMapping("/login")
-    public boolean login(@RequestParam User user) {
-        System.out.println("got login" + user);
-        return user.getName().equals("root")    // TODO login
-                && user.getPassword().equals("maciek");
-    }
+//    @GetMapping("/login")
+//    public boolean login(@RequestParam User user) {
+//        System.out.println("got login" + user);
+//        return user.getName().equals("root")    // TODO login
+//                && user.getPasswordHash().equals("maciek");
+//    }
+//
+//    @PostMapping("/register")
+//    public void register(@RequestBody User user) {
+//        System.out.println("got reg req " + user);
+//
+//    }
 
-    @PostMapping("/register")
-    public void register(@RequestBody User user) {
-        System.out.println("got reg req " + user);
-
-    }
-
-    @GetMapping("/users")
+    @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping("/usersx")
     @ResponseStatus(HttpStatus.OK)
     public List<User> getUsers() {
         return (List<User>) userRepository.findAll();
@@ -39,4 +41,7 @@ public class UserController {
     void addUser(@RequestBody User user) {
         userRepository.save(user);
     }
+
+    @GetMapping("/usersdupa")
+    public String zwrocDupa(){return "dupa";}
 }
