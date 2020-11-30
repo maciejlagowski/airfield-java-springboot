@@ -1,9 +1,8 @@
 package io.github.maciejlagowski.airfield.model.service;
 
-import io.github.maciejlagowski.airfield.model.entity.Role;
 import io.github.maciejlagowski.airfield.model.entity.User;
+import io.github.maciejlagowski.airfield.model.enumeration.ERole;
 import lombok.AllArgsConstructor;
-import org.springframework.boot.autoconfigure.security.SecurityProperties;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -11,7 +10,6 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -29,10 +27,10 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         return buildUserForAuthentication(user, authorities);
     }
 
-    private List<GrantedAuthority> getUserAuthority(Set<Role> roles) {
+    private List<GrantedAuthority> getUserAuthority(Set<ERole> roles) {
         List<GrantedAuthority> authorities = new LinkedList<>();
-        for (Role role : roles) {
-            authorities.add(new SimpleGrantedAuthority(role.getName().toString()));
+        for (ERole role : roles) {
+            authorities.add(new SimpleGrantedAuthority(role.name()));
         }
         return authorities;
     }

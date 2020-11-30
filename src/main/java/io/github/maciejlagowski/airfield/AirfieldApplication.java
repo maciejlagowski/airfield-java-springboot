@@ -31,7 +31,7 @@ public class AirfieldApplication {
     CommandLineRunner init(ReservationRepository reservationRepository, UserRepository userRepository, RoleRepository roleRepository, PasswordEncoder passwordEncoder) {
         return args -> {
             Set<Role> roles = new HashSet<>();
-            Role role = new Role("(ADMIN");
+            Role role = new Role(ERole.ROLE_ADMIN);
             roleRepository.save(role);
             roles.add(role);
             List<User> users = new LinkedList<>();

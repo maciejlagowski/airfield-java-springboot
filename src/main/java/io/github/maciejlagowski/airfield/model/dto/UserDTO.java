@@ -1,13 +1,11 @@
 package io.github.maciejlagowski.airfield.model.dto;
 
-import io.github.maciejlagowski.airfield.model.entity.Role;
+import io.github.maciejlagowski.airfield.model.enumeration.ERole;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.*;
-import java.util.HashSet;
 import java.util.Set;
 
 @Data
@@ -19,5 +17,5 @@ public class UserDTO {
     private String name;
     private String password;
     private String phoneNumber;
-    private Set<Role> roles;
+    private Set<ERole> roles;
 }

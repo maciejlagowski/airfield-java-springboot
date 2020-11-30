@@ -27,7 +27,9 @@ public class Reservation {
     private LocalTime endTime;
     @ManyToOne
     private User user;
+    @Enumerated(EnumType.STRING)
     private EStatus status;
+    @Enumerated(EnumType.STRING)
     private EReservationType reservationType;
     // TODO NotNull not nullable
 
