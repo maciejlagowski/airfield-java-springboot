@@ -9,23 +9,29 @@ import io.github.maciejlagowski.airfield.model.enumeration.EStatus;
 import io.github.maciejlagowski.airfield.model.repository.ReservationRepository;
 import io.github.maciejlagowski.airfield.model.repository.RoleRepository;
 import io.github.maciejlagowski.airfield.model.repository.UserRepository;
+import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.security.Keys;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import javax.crypto.SecretKey;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.*;
 import java.util.stream.Stream;
 
 @SpringBootApplication
+//@EnableSwagger2
 public class AirfieldApplication {
 
     public static void main(String[] args) {
         SpringApplication.run(AirfieldApplication.class, args);
     }
+
+    public final static SecretKey keyForHS = Keys.secretKeyFor(SignatureAlgorithm.HS256);
 
     @Bean
     CommandLineRunner init(ReservationRepository reservationRepository, UserRepository userRepository, RoleRepository roleRepository, PasswordEncoder passwordEncoder) {

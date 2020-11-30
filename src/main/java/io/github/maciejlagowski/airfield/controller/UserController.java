@@ -1,13 +1,12 @@
 package io.github.maciejlagowski.airfield.controller;
 
+import io.github.maciejlagowski.airfield.AirfieldApplication;
 import io.github.maciejlagowski.airfield.model.dto.JwtDTO;
 import io.github.maciejlagowski.airfield.model.dto.LoginDTO;
 import io.github.maciejlagowski.airfield.model.dto.UserDTO;
 import io.github.maciejlagowski.airfield.model.enumeration.ERole;
 import io.github.maciejlagowski.airfield.model.service.UserService;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
-import io.jsonwebtoken.security.Keys;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -37,8 +36,8 @@ public class UserController {
                 .setSubject(Long.toString(id))
                 .claim("roles", roles)
                 .setIssuedAt(new Date(currTime))
-                .setExpiration(new Date(currTime + 60000)) //one minute expiration
-                .signWith(Keys.secretKeyFor(SignatureAlgorithm.HS256))
+                .setExpiration(new Date(currTime + 60000 * 15)) //15 minutes expiration
+                .signWith(AirfieldApplication.keyForHS)
                 .compact());
     }
 
@@ -49,7 +48,7 @@ public class UserController {
 //    }
 
     @PreAuthorize("hasRole('ADMIN')")
-    @GetMapping("/usersx")
+    @GetMapping("/users")
     @ResponseStatus(HttpStatus.OK)
     public List<UserDTO> getUsers() {
         return userService.findAll();
@@ -59,10 +58,5 @@ public class UserController {
     @ResponseStatus(HttpStatus.OK)
     void addUser(@RequestBody UserDTO user) {
         userService.save(user);
-    }
-
-    @GetMapping("/usersdupa")
-    public String zwrocDupa() {
-        return "dupa";
     }
 }
