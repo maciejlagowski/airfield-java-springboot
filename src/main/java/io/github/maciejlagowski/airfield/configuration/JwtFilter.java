@@ -4,6 +4,7 @@ import io.github.maciejlagowski.airfield.AirfieldApplication;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
+import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -26,16 +27,15 @@ public class JwtFilter extends BasicAuthenticationFilter {
     }
 
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws IOException, ServletException {
-        String header = request.getHeader("Authorization");
-        UsernamePasswordAuthenticationToken authResult = getAuthenticationByToken(header);
-        SecurityContextHolder.getContext().setAuthentication(authResult);
+        String header = request.getHeader(HttpHeaders.AUTHORIZATION);
+        if (header != null && !header.equals("")) {
+            UsernamePasswordAuthenticationToken authResult = getAuthenticationByToken(header);
+            SecurityContextHolder.getContext().setAuthentication(authResult);
+        }
         chain.doFilter(request, response);
     }
 
     private UsernamePasswordAuthenticationToken getAuthenticationByToken(String header) {
-        if (header.contains("login")) {
-            return new UsernamePasswordAuthenticationToken("", "", null);
-        }
         Jws<Claims> claimsJws = Jwts.parser().setSigningKey(AirfieldApplication.keyForHS)
                 .parseClaimsJws(header.replace("Bearer ", ""));
 

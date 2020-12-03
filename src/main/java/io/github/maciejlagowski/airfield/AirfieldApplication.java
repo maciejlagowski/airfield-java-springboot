@@ -20,7 +20,10 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import javax.crypto.SecretKey;
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.*;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Random;
+import java.util.Set;
 import java.util.stream.Stream;
 
 @SpringBootApplication
@@ -36,10 +39,8 @@ public class AirfieldApplication {
     @Bean
     CommandLineRunner init(ReservationRepository reservationRepository, UserRepository userRepository, RoleRepository roleRepository, PasswordEncoder passwordEncoder) {
         return args -> {
-            Set<Role> roles = new HashSet<>();
-            Role role = new Role(ERole.ROLE_ADMIN);
-            roleRepository.save(role);
-            roles.add(role);
+            List<Role> roles = List.of(new Role(ERole.ROLE_ADMIN), new Role(ERole.ROLE_EMPLOYEE), new Role(ERole.ROLE_USER), new Role(ERole.ROLE_NOT_LOGGED));
+            roleRepository.saveAll(roles);
             List<User> users = new LinkedList<>();
             Random rand = new Random();
             Stream.of("John", "Julie", "Jennifer", "Helen", "Rachel").forEach(name -> {
@@ -47,29 +48,36 @@ public class AirfieldApplication {
                         .name(name)
                         .phoneNumber(Integer.toString(rand.nextInt(899999999) + 100000000))
                         .passwordHash(passwordEncoder.encode("abc"))
-                        .roles(roles)
+                        .roles(Set.of(roles.get(rand.nextInt(roles.size()))))
                         .build();
                 userRepository.save(user);
                 users.add(user);
+                System.out.println(user);
             });
+            User admin = User.builder()
+                    .name("Admin")
+                    .phoneNumber("666666666")
+                    .passwordHash(passwordEncoder.encode(("admin")))
+                    .roles(Set.of(roles.get(0)))
+                    .build();
+            userRepository.save(admin);
             LocalDate localDate = LocalDate.now();
             for (int i = 0; i < 5; i++) {
                 int timeIterator = 7;
                 LocalDate date = localDate.minusDays(i);
                 for (User user : users) {
-                    reservationRepository.save(new Reservation(
-                            0L,
-                            date,
-                            LocalTime.of(timeIterator, 0),
-                            LocalTime.of(++timeIterator, 0),
-                            user,
-                            EStatus.rand(),
-                            EReservationType.rand()
-                    ));
+                    reservationRepository.save(Reservation.builder()
+                            .date(date)
+                            .startTime(LocalTime.of(timeIterator, 0))
+                            .endTime(LocalTime.of(++timeIterator, 0))
+                            .user(user)
+                            .status(EStatus.rand())
+                            .reservationType(EReservationType.rand())
+                            .build());
                     timeIterator += new Random().nextInt(3);
                 }
             }
-            reservationRepository.findAll().forEach(System.out::println);
+            System.err.println("DATA ADDING ENDED");
         };
     }
 }

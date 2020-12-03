@@ -3,10 +3,13 @@ package io.github.maciejlagowski.airfield.model.service;
 import io.github.maciejlagowski.airfield.model.dto.ReservationDTO;
 import io.github.maciejlagowski.airfield.model.entity.Reservation;
 import io.github.maciejlagowski.airfield.model.entity.User;
+import io.github.maciejlagowski.airfield.model.enumeration.EStatus;
+import io.github.maciejlagowski.airfield.model.repository.ReservationRepository;
 import io.github.maciejlagowski.airfield.model.repository.UserRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -16,6 +19,7 @@ import java.util.NoSuchElementException;
 public class ReservationService {
 
     private final UserRepository userRepository;
+    private final ReservationRepository reservationRepository;
 
     public ReservationDTO constructFromEntity(Reservation reservation) {
         return ReservationDTO.builder()
@@ -42,20 +46,32 @@ public class ReservationService {
         System.err.println(reservationDTO);
         try {
             User user = userRepository.findById(reservationDTO.getUserId()).orElseThrow();
-            reservation = new Reservation(
-                    0,
-                    reservationDTO.getDate(),
-                    reservationDTO.getStartTime(),
-                    reservationDTO.getEndTime(),
-                    user,
-                    reservationDTO.getStatus(),
-                    reservationDTO.getReservationType()
-                    );
+            reservation = Reservation.builder()
+                    .date(reservationDTO.getDate())
+                    .startTime(reservationDTO.getStartTime())
+                    .endTime(reservationDTO.getEndTime())
+                    .user(user)
+                    .status(reservationDTO.getStatus())
+                    .reservationType(reservationDTO.getReservationType())
+                    .build();
         } catch (NoSuchElementException e) {
             //TODO ERROR
             e.printStackTrace();
             throw new NoSuchElementException("User " + reservationDTO.getUserId() + " doesn't exist");
         }
         return reservation;
+    }
+
+    public List<Reservation> findAllByDateOrdered(LocalDate date) {
+        return reservationRepository.findAllByDateOrderByStartTime(date);
+    }
+
+    public void updateStatus(Long id, EStatus status) {
+        reservationRepository.updateStatus(id, status);
+    }
+
+    public void saveWithHoursCheck(ReservationDTO reservationDTO) {
+        Reservation reservation = createReservation(reservationDTO);
+        reservationRepository.saveWithHoursCheck(reservation);
     }
 }

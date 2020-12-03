@@ -1,8 +1,10 @@
 package io.github.maciejlagowski.airfield.configuration;
 
+import io.github.maciejlagowski.airfield.model.repository.UserRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -10,7 +12,6 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -20,17 +21,12 @@ import java.util.List;
 @Configuration
 @EnableWebSecurity
 @AllArgsConstructor
-
+@EnableGlobalMethodSecurity(
+        prePostEnabled = true
+)
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
-    private static final String[] AUTH_WHITELIST = {
-
-            // -- swagger ui
-            "/swagger-resources/**",
-            "/swagger-ui.html",
-            "/v2/api-docs",
-            "/webjars/**"
-    };
+    private final UserRepository userService;
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
@@ -81,14 +77,22 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http.csrf().disable().cors().disable()
-                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+        http.csrf().disable().cors()//.disable()
+//                .and().exceptionHandling().authenticationEntryPoint(authenticationEntryPoint()).and()
+                .and().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and().authorizeRequests().anyRequest().permitAll()
 //        .and().authorizeRequests().antMatchers(AUTH_WHITELIST).permitAll()
-//                .and().addFilter(new JwtFilter(authenticationManager()))
+//                .and().addFilter(new ExceptionFilter())
+                .and().addFilter(new JwtFilter(authenticationManager()))
+                .addFilter(new JwtLoginFilter(authenticationManager(), userService))
         ;
 
-        http.addFilterBefore(new JwtFilter(authenticationManager()), BasicAuthenticationFilter.class);
-
     }
+
+//    @Bean
+//    public AuthenticationEntryPoint authenticationEntryPoint() {
+//        return (httpServletRequest, httpServletResponse, error) -> {
+//            System.err.println("error: " + error.getMessage());
+//        };
+//    }
 }
