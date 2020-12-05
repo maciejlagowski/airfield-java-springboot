@@ -15,6 +15,7 @@ import java.time.LocalTime;
 @Builder
 @NoArgsConstructor
 public class ReservationDTO {
+
     private LocalDate date;
     private LocalTime startTime;
     private LocalTime endTime;

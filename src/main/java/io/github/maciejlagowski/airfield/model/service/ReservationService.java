@@ -13,7 +13,6 @@ import java.time.LocalDate;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -85,6 +84,15 @@ public class ReservationService {
     }
 
     public List<ReservationDTO> blackoutList(List<ReservationDTO> reservations) {
-        return reservations.stream().map(this::blackoutConfidentialData).collect(Collectors.toList());
+        List<ReservationDTO> reservationDTOs = new LinkedList<>();
+        reservations.forEach(reservation -> {
+            EStatus status = reservation.getStatus();
+            if (status.equals(EStatus.ACCEPTED) || status.equals(EStatus.NEW)) {
+                reservationDTOs.add(
+                        blackoutConfidentialData(reservation)
+                );
+            }
+        });
+        return reservationDTOs;
     }
 }

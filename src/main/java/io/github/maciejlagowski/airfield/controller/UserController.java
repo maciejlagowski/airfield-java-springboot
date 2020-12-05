@@ -4,7 +4,6 @@ import io.github.maciejlagowski.airfield.model.dto.UserDTO;
 import io.github.maciejlagowski.airfield.model.service.UserService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -22,13 +21,14 @@ public class UserController {
 //
 //    }
 
-    @PreAuthorize("hasRole('ADMIN')")
+//    @PreAuthorize("hasAnyRole('ADMIN', 'EMPLOYEE')")
     @GetMapping("/users")
     @ResponseStatus(HttpStatus.OK)
     public List<UserDTO> getUsers() {
         return userService.findAll();
     }
 
+    //    @PreAuthorize("hasAnyRole('ADMIN', 'EMPLOYEE')")
     @PostMapping("/users")
     @ResponseStatus(HttpStatus.OK)
     void addUser(@RequestBody UserDTO user) {
