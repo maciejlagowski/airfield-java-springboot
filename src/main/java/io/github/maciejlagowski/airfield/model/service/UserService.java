@@ -1,10 +1,7 @@
 package io.github.maciejlagowski.airfield.model.service;
 
-import io.github.maciejlagowski.airfield.model.dto.LoginDTO;
 import io.github.maciejlagowski.airfield.model.dto.UserDTO;
-import io.github.maciejlagowski.airfield.model.entity.Role;
 import io.github.maciejlagowski.airfield.model.entity.User;
-import io.github.maciejlagowski.airfield.model.enumeration.ERole;
 import io.github.maciejlagowski.airfield.model.repository.UserRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -12,7 +9,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -36,32 +32,35 @@ public class UserService {
                 .name(userDTO.getName())
                 .passwordHash(passwordEncoder.encode(userDTO.getPassword()))
                 .phoneNumber(userDTO.getPhoneNumber())
-                .roles(userDTO.getRoles().stream().map(Role::new).collect(Collectors.toSet()))
+                .role(userDTO.getRole())
                 .build();
     }
 
     public UserDTO constructDTOFromEntity(User user) {
         return UserDTO.builder()
+                .id(user.getId())
                 .name(user.getName())
                 .phoneNumber(user.getPhoneNumber())
-                .roles(user.getRoles())
+                .role(user.getRole())
                 .build();
     }
 
-    public Set<ERole> loginUser(LoginDTO loginDTO) {
-        if (userRepository.findByName(loginDTO.getName()).isEmpty()) {
-            return Set.of(ERole.ROLE_NOT_LOGGED);
-        }
-        User user = userRepository.findByName(loginDTO.getName()).get();
-        if (passwordEncoder.matches(loginDTO.getPassword(), user.getPasswordHash())) {
-            return user.getRoles();
-        } else {
-            return Set.of(ERole.ROLE_NOT_LOGGED);
-        }
-    }
+    // TODO delete?
+//    public Set<ERole> loginUser(LoginDTO loginDTO) {
+//        if (userRepository.findByName(loginDTO.getName()).isEmpty()) {
+//            return Set.of(ERole.ROLE_NOT_LOGGED);
+//        }
+//        User user = userRepository.findByName(loginDTO.getName()).get();
+//        if (passwordEncoder.matches(loginDTO.getPassword(), user.getPasswordHash())) {
+//            return user.getRoles();
+//        } else {
+//            return Set.of(ERole.ROLE_NOT_LOGGED);
+//        }
+//    }
 
     public List<UserDTO> findAll() {
-        List<User> users = (List<User>) userRepository.findAll();
-        return users.stream().map(this::constructDTOFromEntity).collect(Collectors.toList());
+        return userRepository.findAll()
+                .stream().map(this::constructDTOFromEntity)
+                .collect(Collectors.toList());
     }
 }

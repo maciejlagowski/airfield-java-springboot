@@ -1,4 +1,4 @@
-package io.github.maciejlagowski.airfield.configuration;
+package io.github.maciejlagowski.airfield.filter;
 
 import io.github.maciejlagowski.airfield.AirfieldApplication;
 import io.jsonwebtoken.Claims;
@@ -16,9 +16,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 public class JwtFilter extends BasicAuthenticationFilter {
 
@@ -40,9 +38,9 @@ public class JwtFilter extends BasicAuthenticationFilter {
                 .parseClaimsJws(header.replace("Bearer ", ""));
 
         String userId = claimsJws.getBody().get("sub").toString();
-        ArrayList<String> roles = (ArrayList<String>) claimsJws.getBody().get("roles");
-        Set<SimpleGrantedAuthority> simpleGrantedAuthorities = roles.stream().map(SimpleGrantedAuthority::new).collect(Collectors.toSet());
+        String role = claimsJws.getBody().get("role").toString();
+        Set<SimpleGrantedAuthority> authorities = Set.of(new SimpleGrantedAuthority(role));
 
-        return new UsernamePasswordAuthenticationToken(userId, null, simpleGrantedAuthorities);
+        return new UsernamePasswordAuthenticationToken(userId, null, authorities);
     }
 }

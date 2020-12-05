@@ -1,5 +1,7 @@
 package io.github.maciejlagowski.airfield.configuration;
 
+import io.github.maciejlagowski.airfield.filter.JwtFilter;
+import io.github.maciejlagowski.airfield.filter.JwtLoginFilter;
 import io.github.maciejlagowski.airfield.model.repository.UserRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -49,7 +51,8 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 "/swagger-resources/**",
                 "/configuration/security",
                 "/swagger-ui.html",
-                "/webjars/**");
+                "/webjars/**",
+                "/weather");
     }
 //    private final UserDetailsServiceImpl userDetailsService;
 //    private final AuthEntryPointJwt unauthorizedHandler;
@@ -77,11 +80,10 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http.csrf().disable().cors()//.disable()
+        http.csrf().disable().cors()
 //                .and().exceptionHandling().authenticationEntryPoint(authenticationEntryPoint()).and()
                 .and().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and().authorizeRequests().anyRequest().permitAll()
-//        .and().authorizeRequests().antMatchers(AUTH_WHITELIST).permitAll()
 //                .and().addFilter(new ExceptionFilter())
                 .and().addFilter(new JwtFilter(authenticationManager()))
                 .addFilter(new JwtLoginFilter(authenticationManager(), userService))

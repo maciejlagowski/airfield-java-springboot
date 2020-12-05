@@ -6,16 +6,14 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.Set;
-
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 public class UserDTO {
-
+    private Long id;
     private String name;
     private String password;
     private String phoneNumber;
-    private Set<ERole> roles;
+    private ERole role;
 }

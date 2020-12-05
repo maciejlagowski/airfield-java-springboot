@@ -1,13 +1,11 @@
 package io.github.maciejlagowski.airfield;
 
 import io.github.maciejlagowski.airfield.model.entity.Reservation;
-import io.github.maciejlagowski.airfield.model.entity.Role;
 import io.github.maciejlagowski.airfield.model.entity.User;
 import io.github.maciejlagowski.airfield.model.enumeration.EReservationType;
 import io.github.maciejlagowski.airfield.model.enumeration.ERole;
 import io.github.maciejlagowski.airfield.model.enumeration.EStatus;
 import io.github.maciejlagowski.airfield.model.repository.ReservationRepository;
-import io.github.maciejlagowski.airfield.model.repository.RoleRepository;
 import io.github.maciejlagowski.airfield.model.repository.UserRepository;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
@@ -23,7 +21,6 @@ import java.time.LocalTime;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
-import java.util.Set;
 import java.util.stream.Stream;
 
 @SpringBootApplication
@@ -37,10 +34,8 @@ public class AirfieldApplication {
     public final static SecretKey keyForHS = Keys.secretKeyFor(SignatureAlgorithm.HS256);
 
     @Bean
-    CommandLineRunner init(ReservationRepository reservationRepository, UserRepository userRepository, RoleRepository roleRepository, PasswordEncoder passwordEncoder) {
+    CommandLineRunner init(ReservationRepository reservationRepository, UserRepository userRepository, PasswordEncoder passwordEncoder) {
         return args -> {
-            List<Role> roles = List.of(new Role(ERole.ROLE_ADMIN), new Role(ERole.ROLE_EMPLOYEE), new Role(ERole.ROLE_USER), new Role(ERole.ROLE_NOT_LOGGED));
-            roleRepository.saveAll(roles);
             List<User> users = new LinkedList<>();
             Random rand = new Random();
             Stream.of("John", "Julie", "Jennifer", "Helen", "Rachel").forEach(name -> {
@@ -48,7 +43,7 @@ public class AirfieldApplication {
                         .name(name)
                         .phoneNumber(Integer.toString(rand.nextInt(899999999) + 100000000))
                         .passwordHash(passwordEncoder.encode("abc"))
-                        .roles(Set.of(roles.get(rand.nextInt(roles.size()))))
+                        .role(ERole.rand())
                         .build();
                 userRepository.save(user);
                 users.add(user);
@@ -58,7 +53,7 @@ public class AirfieldApplication {
                     .name("Admin")
                     .phoneNumber("666666666")
                     .passwordHash(passwordEncoder.encode(("admin")))
-                    .roles(Set.of(roles.get(0)))
+                    .role(ERole.ROLE_ADMIN)
                     .build();
             userRepository.save(admin);
             LocalDate localDate = LocalDate.now();
@@ -77,7 +72,7 @@ public class AirfieldApplication {
                     timeIterator += new Random().nextInt(3);
                 }
             }
-            System.err.println("DATA ADDING ENDED");
+            System.err.println("------------ DATA ADD DONE ------------");
         };
     }
 }

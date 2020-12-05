@@ -10,9 +10,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 
 @Service
 @AllArgsConstructor
@@ -23,16 +21,12 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String userName) throws UsernameNotFoundException {
         User user = userService.findUserByName(userName);
-        List<GrantedAuthority> authorities = getUserAuthority(user.getRoles());
+        List<GrantedAuthority> authorities = getUserAuthority(user.getRole());
         return buildUserForAuthentication(user, authorities);
     }
 
-    private List<GrantedAuthority> getUserAuthority(Set<ERole> roles) {
-        List<GrantedAuthority> authorities = new LinkedList<>();
-        for (ERole role : roles) {
-            authorities.add(new SimpleGrantedAuthority(role.name()));
-        }
-        return authorities;
+    private List<GrantedAuthority> getUserAuthority(ERole role) {
+        return List.of(new SimpleGrantedAuthority(role.name()));
     }
 
     private UserDetails buildUserForAuthentication(User user, List<GrantedAuthority> authorities) {

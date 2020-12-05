@@ -13,6 +13,7 @@ import java.time.LocalDate;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -62,8 +63,10 @@ public class ReservationService {
         return reservation;
     }
 
-    public List<Reservation> findAllByDateOrdered(LocalDate date) {
-        return reservationRepository.findAllByDateOrderByStartTime(date);
+    public List<ReservationDTO> findAllByDateOrdered(LocalDate date) {
+        return reservationListToDTOList(
+                reservationRepository.findAllByDateOrderByStartTime(date)
+        );
     }
 
     public void updateStatus(Long id, EStatus status) {
@@ -73,5 +76,15 @@ public class ReservationService {
     public void saveWithHoursCheck(ReservationDTO reservationDTO) {
         Reservation reservation = createReservation(reservationDTO);
         reservationRepository.saveWithHoursCheck(reservation);
+    }
+
+    public ReservationDTO blackoutConfidentialData(ReservationDTO reservation) {
+        reservation.setName("********");
+        reservation.setTelephone("********");
+        return reservation;
+    }
+
+    public List<ReservationDTO> blackoutList(List<ReservationDTO> reservations) {
+        return reservations.stream().map(this::blackoutConfidentialData).collect(Collectors.toList());
     }
 }

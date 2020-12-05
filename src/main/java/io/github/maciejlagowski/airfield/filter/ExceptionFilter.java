@@ -1,4 +1,4 @@
-package io.github.maciejlagowski.airfield.configuration;
+package io.github.maciejlagowski.airfield.filter;
 
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;

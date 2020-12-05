@@ -1,4 +1,4 @@
-package io.github.maciejlagowski.airfield.configuration;
+package io.github.maciejlagowski.airfield.filter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.maciejlagowski.airfield.AirfieldApplication;
@@ -51,13 +51,18 @@ public class JwtLoginFilter extends UsernamePasswordAuthenticationFilter {
         User user = userService.findByName(authResult.getName()).get();
 
         long currTime = System.currentTimeMillis();
+        long expirationTime = currTime + 60000 * 60; // 60 minutes expiration
+//        long expirationTime = currTime + 60000 * 15; // 15 minutes expiration
+//        long expirationTime = currTime + 6000; // 6 seconds expiration
         JwtDTO jwtDTO = new JwtDTO(Jwts.builder()
                 .setSubject(Long.toString(user.getId()))
-                .claim("roles", user.getRoles())
+                .claim("role", user.getRole())
                 .setIssuedAt(new Date(currTime))
-                .setExpiration(new Date(currTime + 60000 * 15)) //15 minutes expiration
+                .setExpiration(new Date(expirationTime))
                 .signWith(AirfieldApplication.keyForHS)
-                .compact());
+                .compact(),
+                expirationTime,
+                user.getRole());
 
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.setStatus(HttpStatus.CREATED.value());
