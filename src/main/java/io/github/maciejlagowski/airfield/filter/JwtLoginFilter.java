@@ -3,7 +3,7 @@ package io.github.maciejlagowski.airfield.filter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.maciejlagowski.airfield.AirfieldApplication;
 import io.github.maciejlagowski.airfield.model.dto.JwtDTO;
-import io.github.maciejlagowski.airfield.model.dto.LoginDTO;
+import io.github.maciejlagowski.airfield.model.dto.UserDTO;
 import io.github.maciejlagowski.airfield.model.entity.User;
 import io.github.maciejlagowski.airfield.model.repository.UserRepository;
 import io.jsonwebtoken.Jwts;
@@ -33,11 +33,11 @@ public class JwtLoginFilter extends UsernamePasswordAuthenticationFilter {
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException {
         try {
-            LoginDTO loginDTO = new ObjectMapper()
-                    .readValue(request.getInputStream(), LoginDTO.class);
+            UserDTO userDTO = new ObjectMapper()
+                    .readValue(request.getInputStream(), UserDTO.class);
             return authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
-                    loginDTO.getName(),
-                    loginDTO.getPassword(),
+                    userDTO.getEmail(),
+                    userDTO.getPassword(),
                     Collections.EMPTY_LIST));
         } catch (IOException e) {
             e.printStackTrace();
@@ -48,7 +48,7 @@ public class JwtLoginFilter extends UsernamePasswordAuthenticationFilter {
 
     @Override
     protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authResult) throws IOException, ServletException {
-        User user = userService.findByName(authResult.getName()).get();
+        User user = userService.findByEmail(authResult.getName()).get();
 
         long currTime = System.currentTimeMillis();
         long expirationTime = currTime + 60000 * 60; // 60 minutes expiration

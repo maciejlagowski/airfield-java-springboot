@@ -68,10 +68,6 @@ public class ReservationService {
         );
     }
 
-    public void updateStatus(Long id, EStatus status) {
-        reservationRepository.updateStatus(id, status);
-    }
-
     public void saveWithHoursCheck(ReservationDTO reservationDTO) {
         Reservation reservation = createReservation(reservationDTO);
         reservationRepository.saveWithHoursCheck(reservation);

@@ -18,7 +18,7 @@ public class WeatherDTOService {
                 .mainWeather(hourly.getWeather().getMain())
                 .descriptionWeather(hourly.getWeather().getDescription())
                 .clouds(hourly.getClouds())
-                .pop(hourly.getPop())
+                .pop(hourly.getPop() * 100)
                 .build();
     }
 

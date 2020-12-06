@@ -22,13 +22,14 @@ public class UserService {
         userRepository.save(constructEntityFromDTO(user));
     }
 
-    public User findUserByName(String name) {
-        return userRepository.findByName(name)
-                .orElseThrow(() -> new UsernameNotFoundException("Cannot find user '" + name + "' in database"));
+    public User findUserByEmail(String email) {
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new UsernameNotFoundException("Cannot find user '" + email + "' in database"));
     }
 
     public User constructEntityFromDTO(UserDTO userDTO) {
         return User.builder()
+                .email(userDTO.getEmail())
                 .name(userDTO.getName())
                 .passwordHash(passwordEncoder.encode(userDTO.getPassword()))
                 .phoneNumber(userDTO.getPhoneNumber())
@@ -39,24 +40,12 @@ public class UserService {
     public UserDTO constructDTOFromEntity(User user) {
         return UserDTO.builder()
                 .id(user.getId())
+                .email(user.getEmail())
                 .name(user.getName())
                 .phoneNumber(user.getPhoneNumber())
                 .role(user.getRole())
                 .build();
     }
-
-    // TODO delete?
-//    public Set<ERole> loginUser(LoginDTO loginDTO) {
-//        if (userRepository.findByName(loginDTO.getName()).isEmpty()) {
-//            return Set.of(ERole.ROLE_NOT_LOGGED);
-//        }
-//        User user = userRepository.findByName(loginDTO.getName()).get();
-//        if (passwordEncoder.matches(loginDTO.getPassword(), user.getPasswordHash())) {
-//            return user.getRoles();
-//        } else {
-//            return Set.of(ERole.ROLE_NOT_LOGGED);
-//        }
-//    }
 
     public List<UserDTO> findAll() {
         return userRepository.findAll()

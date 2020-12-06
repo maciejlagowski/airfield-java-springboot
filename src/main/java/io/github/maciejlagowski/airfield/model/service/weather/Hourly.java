@@ -3,7 +3,7 @@ package io.github.maciejlagowski.airfield.model.service.weather;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import io.github.maciejlagowski.airfield.model.helper.DateConverter;
+import io.github.maciejlagowski.airfield.model.helper.DateHelper;
 import lombok.Data;
 
 import java.time.LocalDateTime;
@@ -21,6 +21,8 @@ class Hourly {
     private Long humidity;
     @JsonProperty("dew_point")
     private Double dewPoint;
+    @JsonIgnore
+    private Double uvi;
     private Long clouds;
     private Long visibility;
     @JsonProperty("wind_speed")
@@ -38,7 +40,7 @@ class Hourly {
     private Object snow;
 
     public LocalDateTime getDateTime() {
-        return DateConverter.unixTimeToLocalDateTime(dateTime);
+        return DateHelper.unixTimeToLocalDateTime(dateTime);
     }
 
     public Weather getWeather() {

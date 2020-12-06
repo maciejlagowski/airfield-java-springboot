@@ -53,7 +53,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 "/swagger-ui.html",
                 "/webjars/**",
                 "/weather"
-                , "/**" // TODO delete to activate spring security
+//                , "/**" // TODO delete to activate spring security
         );
     }
 

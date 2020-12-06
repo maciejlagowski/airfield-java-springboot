@@ -33,7 +33,6 @@ public class Reservation {
     private EStatus status;
     @Enumerated(EnumType.STRING)
     private EReservationType reservationType;
-    // TODO NotNull not nullable
 
 //    public Reservation(long id, LocalDate date, LocalTime startTime, LocalTime endTime, User user, ReservationType reservationType, Status status) {
 //        if (endTime.isBefore(startTime)) {

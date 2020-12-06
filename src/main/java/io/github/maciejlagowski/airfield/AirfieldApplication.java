@@ -13,6 +13,7 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
+import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import javax.crypto.SecretKey;
@@ -24,7 +25,7 @@ import java.util.Random;
 import java.util.stream.Stream;
 
 @SpringBootApplication
-//@EnableSwagger2
+@EnableScheduling
 public class AirfieldApplication {
 
     public static void main(String[] args) {
@@ -40,6 +41,7 @@ public class AirfieldApplication {
             Random rand = new Random();
             Stream.of("John", "Julie", "Jennifer", "Helen", "Rachel").forEach(name -> {
                 User user = User.builder()
+                        .email(name + "@mail.com")
                         .name(name)
                         .phoneNumber(Integer.toString(rand.nextInt(899999999) + 100000000))
                         .passwordHash(passwordEncoder.encode("abc"))
@@ -50,6 +52,7 @@ public class AirfieldApplication {
                 System.out.println(user);
             });
             User admin = User.builder()
+                    .email("admin@admin.com")
                     .name("Admin")
                     .phoneNumber("666666666")
                     .passwordHash(passwordEncoder.encode(("admin")))

@@ -2,7 +2,7 @@ package io.github.maciejlagowski.airfield.model.service.weather;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import io.github.maciejlagowski.airfield.model.helper.DateConverter;
+import io.github.maciejlagowski.airfield.model.helper.DateHelper;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
@@ -26,10 +26,10 @@ class Daily extends Hourly {
     private Double uvi;
 
     public LocalDateTime getSunrise() {
-        return DateConverter.unixTimeToLocalDateTime(sunrise);
+        return DateHelper.unixTimeToLocalDateTime(sunrise);
     }
 
     public LocalDateTime getSunset() {
-        return DateConverter.unixTimeToLocalDateTime(sunset);
+        return DateHelper.unixTimeToLocalDateTime(sunset);
     }
 }

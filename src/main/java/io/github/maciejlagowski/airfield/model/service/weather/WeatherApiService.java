@@ -3,10 +3,10 @@ package io.github.maciejlagowski.airfield.model.service.weather;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.maciejlagowski.airfield.model.dto.WeatherDTO;
-import io.github.maciejlagowski.airfield.model.helper.DateConverter;
+import io.github.maciejlagowski.airfield.model.helper.DateHelper;
 import javassist.NotFoundException;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Bean;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -30,17 +30,17 @@ public class WeatherApiService {
         this.dtoService = dtoService;
     }
 
-    @Bean
-    public void updateWeather() throws JsonProcessingException { // TODO switch to real API, updating every hour?
-//        String result = restTemplate.getForObject(url + apiKey, String.class);
-        String result = getFakeApi();
+    @Scheduled(fixedRate = 3600000)
+    public void updateWeather() throws JsonProcessingException {
+        String result = restTemplate.getForObject(url + apiKey, String.class);
+//        String result = getFakeApi();
         ObjectMapper objectMapper = new ObjectMapper();
         weather = objectMapper.readValue(result, WeatherApiResponse.class);
-//        if (weather.getZone().equals(ZoneId.systemDefault())) {
-//            System.out.println("Weather updated");
-//        } else {
-//            throw new ZoneRulesException("Timezones from api and system are different");
-//        }
+        if (weather.getZone().equals(ZoneId.systemDefault())) {
+            System.out.println("Weather updated");
+        } else {
+            throw new ZoneRulesException("Timezones from api and system are different");
+        }
     }
 
     public WeatherDTO getWeatherOnDay(LocalDateTime date) throws NotFoundException {
@@ -57,7 +57,7 @@ public class WeatherApiService {
 
     private String getFakeApi() {
         LocalDateTime localDateTime = LocalDateTime.of(LocalDate.now(), LocalTime.of(7, 0));
-        long unixTime = DateConverter.localDateTimeToUnixTime(localDateTime);
+        long unixTime = DateHelper.localDateTimeToUnixTime(localDateTime);
         return "{\"lat\":52.23,\"lon\":21.01,\"timezone\":\"Europe/Warsaw\",\"timezone_offset\":3600,\"hourly\":[{\"" +
                 "dt\":" + (unixTime + 3600) + ",\"temp\":9.84,\"feels_like\":7.89,\"pressure\":1020,\"humidity\":87,\"dew_point\":7.78,\"clouds\":20,\"visibility\":10000,\"wind_speed\":2.05,\"wind_deg\":194,\"weather\":[{\"id\":801,\"main\":\"Clouds\",\"description\":\"few clouds\",\"icon\":\"02d\"}],\"pop\":0},{\"" +
                 "dt\":" + (unixTime + 7200) + ",\"temp\":9.64,\"feels_like\":7.32,\"pressure\":1020,\"humidity\":84,\"dew_point\":7.07,\"clouds\":59,\"visibility\":10000,\"wind_speed\":2.34,\"wind_deg\":192,\"weather\":[{\"id\":803,\"main\":\"Clouds\",\"description\":\"broken clouds\",\"icon\":\"04d\"}],\"pop\":0},{\"" +

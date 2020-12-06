@@ -5,7 +5,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
 
-public class DateConverter {
+public class DateHelper {
 
     public static LocalDateTime unixTimeToLocalDateTime(Long date) {
         return Instant.ofEpochMilli(date * 1000).atZone(ZoneId.systemDefault()).toLocalDateTime();
