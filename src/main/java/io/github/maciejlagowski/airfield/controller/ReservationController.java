@@ -29,7 +29,7 @@ public class ReservationController {
     @PreAuthorize("hasAnyRole('USER', 'ADMIN', 'EMPLOYEE')")
     @GetMapping("/reservations")
     @ResponseStatus(HttpStatus.OK)
-    public List<ReservationDTO> getReservations(@RequestParam String date, HttpServletRequest request) {
+    public List<ReservationDTO> getReservations(@RequestParam String date, HttpServletRequest request) throws IllegalAccessException {
         Long loggedUserId = this.jwtService.getUserIdFromJwt(request.getHeader(HttpHeaders.AUTHORIZATION));
         List<ReservationDTO> reservations = reservationService.findAllByDateOrdered(LocalDate.parse(date));
         SecurityContextHolderAwareRequestWrapper requestWrapper = new SecurityContextHolderAwareRequestWrapper(request, "ROLE_");

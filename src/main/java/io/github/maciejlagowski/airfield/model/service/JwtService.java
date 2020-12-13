@@ -1,5 +1,6 @@
 package io.github.maciejlagowski.airfield.model.service;
 
+import io.github.maciejlagowski.airfield.exception.UserNotFoundException;
 import io.github.maciejlagowski.airfield.model.dto.JwtDTO;
 import io.github.maciejlagowski.airfield.model.entity.User;
 import io.github.maciejlagowski.airfield.model.repository.UserRepository;
@@ -11,7 +12,6 @@ import io.jsonwebtoken.security.Keys;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;
@@ -46,7 +46,7 @@ public class JwtService {
 
     public JwtDTO buildJwt(String email, long expirationDelayMinutes) {
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new UsernameNotFoundException("Cannot find user " + email + " in database"));
+                .orElseThrow(() -> new UserNotFoundException(email));
         long currTime = System.currentTimeMillis();
         long expirationTime = currTime + expirationDelayMinutes * 60000;
         return new JwtDTO(Jwts.builder()

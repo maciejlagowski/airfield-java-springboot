@@ -1,5 +1,6 @@
 package io.github.maciejlagowski.airfield.model.service;
 
+import io.github.maciejlagowski.airfield.exception.UserNotFoundException;
 import io.github.maciejlagowski.airfield.model.dto.ReservationDTO;
 import io.github.maciejlagowski.airfield.model.entity.Reservation;
 import io.github.maciejlagowski.airfield.model.entity.User;
@@ -12,7 +13,6 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.NoSuchElementException;
 
 @Service
 @AllArgsConstructor
@@ -41,21 +41,18 @@ public class ReservationService {
         return dtoList;
     }
 
-    public Reservation createReservation(ReservationDTO reservationDTO) throws NoSuchElementException {
+    public Reservation createReservation(ReservationDTO reservationDTO) {
         Reservation reservation;
-        try {
-            User user = userRepository.findById(reservationDTO.getUserId()).orElseThrow();
-            reservation = Reservation.builder()
-                    .date(reservationDTO.getDate())
-                    .startTime(reservationDTO.getStartTime())
-                    .endTime(reservationDTO.getEndTime())
-                    .user(user)
-                    .status(reservationDTO.getStatus())
-                    .reservationType(reservationDTO.getReservationType())
-                    .build();
-        } catch (NoSuchElementException e) {
-            throw new NoSuchElementException("User " + reservationDTO.getUserId() + " doesn't exist");
-        }
+        User user = userRepository.findById(reservationDTO.getUserId())
+                .orElseThrow(UserNotFoundException::new);
+        reservation = Reservation.builder()
+                .date(reservationDTO.getDate())
+                .startTime(reservationDTO.getStartTime())
+                .endTime(reservationDTO.getEndTime())
+                .user(user)
+                .status(reservationDTO.getStatus())
+                .reservationType(reservationDTO.getReservationType())
+                .build();
         return reservation;
     }
 

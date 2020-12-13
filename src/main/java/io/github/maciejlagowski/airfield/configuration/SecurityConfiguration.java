@@ -2,6 +2,7 @@ package io.github.maciejlagowski.airfield.configuration;
 
 import io.github.maciejlagowski.airfield.filter.JwtFilter;
 import io.github.maciejlagowski.airfield.filter.JwtLoginFilter;
+import io.github.maciejlagowski.airfield.model.repository.UserRepository;
 import io.github.maciejlagowski.airfield.model.service.JwtService;
 import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -30,6 +31,7 @@ import java.util.List;
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     private final JwtService jwtService;
+    private final UserRepository userRepository;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -73,11 +75,10 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.csrf().disable().cors()
-//                .and().exceptionHandling().authenticationEntryPoint(authenticationEntryPoint()).and()
                 .and().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and().authorizeRequests().anyRequest().permitAll()
                 .and().addFilter(new JwtFilter(authenticationManager(), jwtService))
-                .addFilter(new JwtLoginFilter(authenticationManager(), jwtService))
+                .addFilter(new JwtLoginFilter(authenticationManager(), jwtService, userRepository))
         ;
 
     }

@@ -1,6 +1,7 @@
 package io.github.maciejlagowski.airfield.controller;
 
 import io.github.maciejlagowski.airfield.AirfieldApplication;
+import io.github.maciejlagowski.airfield.exception.UserNotFoundException;
 import javassist.NotFoundException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -12,8 +13,8 @@ import java.security.SignatureException;
 @ControllerAdvice
 public class GlobalControllerExceptionHandler {
 
-    @ExceptionHandler(NotFoundException.class)
-    public void handleNotFoundException(HttpServletResponse httpServletResponse, NotFoundException e) throws IOException {
+    @ExceptionHandler(UserNotFoundException.class)
+    public void handleUserNotFoundException(HttpServletResponse httpServletResponse, NotFoundException e) throws IOException {
         if (AirfieldApplication.debug)
             e.printStackTrace();
         httpServletResponse.sendError(404, e.getMessage());
@@ -24,5 +25,20 @@ public class GlobalControllerExceptionHandler {
         if (AirfieldApplication.debug)
             e.printStackTrace();
         httpServletResponse.sendError(401, "User login problem, please try to logout and login again");
+    }
+
+    @ExceptionHandler(IllegalAccessException.class)
+    public void handleIllegalAccessException(HttpServletResponse httpServletResponse, IllegalAccessException e) throws IOException {
+        if (AirfieldApplication.debug)
+            e.printStackTrace();
+        httpServletResponse.sendError(400, e.getMessage());
+    }
+
+    @ExceptionHandler(Exception.class)
+    public void handleOtherExceptions(HttpServletResponse httpServletResponse, Exception e) throws IOException {
+        if (AirfieldApplication.debug)
+            e.printStackTrace();
+        httpServletResponse.sendError(500, e.getMessage());
+
     }
 }

@@ -25,7 +25,7 @@ import java.util.stream.Stream;
 @EnableScheduling
 public class AirfieldApplication {
 
-    public static final boolean debug = false;
+    public static final boolean debug = true;
 
     public static void main(String[] args) {
         SpringApplication.run(AirfieldApplication.class, args);

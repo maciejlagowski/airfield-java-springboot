@@ -1,11 +1,11 @@
 package io.github.maciejlagowski.airfield.model.service;
 
+import io.github.maciejlagowski.airfield.exception.UserNotFoundException;
 import io.github.maciejlagowski.airfield.model.dto.UserDTO;
 import io.github.maciejlagowski.airfield.model.entity.User;
 import io.github.maciejlagowski.airfield.model.enumeration.ERole;
 import io.github.maciejlagowski.airfield.model.repository.UserRepository;
 import lombok.AllArgsConstructor;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -24,9 +24,9 @@ public class UserService {
         userRepository.save(constructEntityFromDTO(user));
     }
 
-    public User findUserByEmail(String email) {
+    public User getUserByEmail(String email) {
         return userRepository.findByEmail(email)
-                .orElseThrow(() -> new UsernameNotFoundException("Cannot find user '" + email + "' in database"));
+                .orElseThrow(() -> new UserNotFoundException(email));
     }
 
     public User constructEntityFromDTO(UserDTO userDTO) {
@@ -58,12 +58,12 @@ public class UserService {
 
     public UserDTO getUserById(Long userId) {
         return constructDTOFromEntity(userRepository.findById(userId)
-                .orElseThrow(() -> new UsernameNotFoundException("Cannot find user in database")));
+                .orElseThrow(() -> new UserNotFoundException()));
     }
 
     public void update(UserDTO userDTO) {
         User user = userRepository.findById(userDTO.getId())
-                .orElseThrow(() -> new UsernameNotFoundException("Cannot find user in database"));
+                .orElseThrow(UserNotFoundException::new);
         if (Objects.nonNull(userDTO.getName()))
             user.setName(userDTO.getName());
         if (Objects.nonNull(userDTO.getPhoneNumber()))
@@ -76,7 +76,7 @@ public class UserService {
 
     public void activateUser(String token) {
         User user = userRepository.findByToken(token)
-                .orElseThrow(() -> new UsernameNotFoundException("Cannot find user in database for given token"));
+                .orElseThrow(UserNotFoundException::new);
         user.setRole(ERole.ROLE_USER);
         user.setToken(null);
         userRepository.save(user);
