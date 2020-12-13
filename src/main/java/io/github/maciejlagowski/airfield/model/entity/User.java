@@ -30,4 +30,5 @@ public class User {
     private String phoneNumber;
     @Enumerated(EnumType.STRING)
     private ERole role;
+    private String token;
 }

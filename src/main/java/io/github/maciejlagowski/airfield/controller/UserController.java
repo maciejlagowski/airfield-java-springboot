@@ -2,6 +2,7 @@ package io.github.maciejlagowski.airfield.controller;
 
 import io.github.maciejlagowski.airfield.model.dto.UserDTO;
 import io.github.maciejlagowski.airfield.model.enumeration.ERole;
+import io.github.maciejlagowski.airfield.model.service.EmailService;
 import io.github.maciejlagowski.airfield.model.service.JwtService;
 import io.github.maciejlagowski.airfield.model.service.UserService;
 import lombok.AllArgsConstructor;
@@ -10,6 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import javax.mail.MessagingException;
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
@@ -20,12 +22,7 @@ public class UserController {
 
     private final UserService userService;
     private final JwtService jwtService;
-
-//    @PostMapping("/register")
-//    public void register(@RequestBody User user) {
-//        System.out.println("got reg req " + user);
-//
-//    }
+    private final EmailService emailService;
 
     @PreAuthorize("hasAnyRole('ADMIN', 'EMPLOYEE')")
     @GetMapping("/users")
@@ -36,9 +33,20 @@ public class UserController {
 
     @PostMapping("/users/register")
     @ResponseStatus(HttpStatus.OK)
-    void register(@RequestBody UserDTO user) {
-        user.setRole(ERole.ROLE_USER);
+    public void register(@RequestBody UserDTO user) throws MessagingException {
+        String token = emailService.generateToken();
+        user.setToken(token);
+        user.setRole(ERole.ROLE_INACTIVE);
+        emailService.sendActivationLink(user);
         userService.save(user);
+    }
+
+    // TODO activation on frontend?
+    @GetMapping("/users/activate")
+    @ResponseStatus(HttpStatus.OK)
+    public String activate(@RequestParam String token) {
+        userService.activateUser(token);
+        return "User activated! You can close this page.";
     }
 
     @GetMapping("/users/logged")

@@ -17,4 +17,5 @@ public class UserDTO {
     private String password;
     private String phoneNumber;
     private ERole role;
+    private String token;
 }

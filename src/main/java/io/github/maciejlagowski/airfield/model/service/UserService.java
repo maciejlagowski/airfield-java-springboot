@@ -2,6 +2,7 @@ package io.github.maciejlagowski.airfield.model.service;
 
 import io.github.maciejlagowski.airfield.model.dto.UserDTO;
 import io.github.maciejlagowski.airfield.model.entity.User;
+import io.github.maciejlagowski.airfield.model.enumeration.ERole;
 import io.github.maciejlagowski.airfield.model.repository.UserRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -35,6 +36,7 @@ public class UserService {
                 .passwordHash(passwordEncoder.encode(userDTO.getPassword()))
                 .phoneNumber(userDTO.getPhoneNumber())
                 .role(userDTO.getRole())
+                .token(userDTO.getToken())
                 .build();
     }
 
@@ -70,5 +72,13 @@ public class UserService {
             user.setPasswordHash(passwordEncoder.encode(userDTO.getPassword()));
         userRepository.save(user);
 
+    }
+
+    public void activateUser(String token) {
+        User user = userRepository.findByToken(token)
+                .orElseThrow(() -> new UsernameNotFoundException("Cannot find user in database for given token"));
+        user.setRole(ERole.ROLE_USER);
+        user.setToken(null);
+        userRepository.save(user);
     }
 }

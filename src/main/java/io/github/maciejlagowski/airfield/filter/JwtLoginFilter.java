@@ -18,13 +18,15 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.Collections;
+import java.util.LinkedList;
 
 @AllArgsConstructor
 public class JwtLoginFilter extends UsernamePasswordAuthenticationFilter {
 
     private final AuthenticationManager authenticationManager;
     private final JwtService jwtService;
+
+    // TODO inactivated user cannot log in
 
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException {
@@ -34,7 +36,7 @@ public class JwtLoginFilter extends UsernamePasswordAuthenticationFilter {
             return authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
                     userDTO.getEmail(),
                     userDTO.getPassword(),
-                    Collections.EMPTY_LIST));
+                    new LinkedList<>()));
         } catch (IOException e) {
             e.printStackTrace();
         }

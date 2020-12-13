@@ -34,19 +34,6 @@ public class Reservation {
     @Enumerated(EnumType.STRING)
     private EReservationType reservationType;
 
-//    public Reservation(long id, LocalDate date, LocalTime startTime, LocalTime endTime, User user, ReservationType reservationType, Status status) {
-//        if (endTime.isBefore(startTime)) {
-//            throw new IllegalArgumentException("End time cannot be earlier than start time");
-//        }
-//        this.id = id;
-//        this.date = date;
-//        this.startTime = startTime;
-//        this.endTime = endTime;
-//        this.user = user;
-//        this.reservationType = reservationType;
-//        this.status = status;
-//    }
-
     public boolean collides(Reservation reservation) {
         return (this.startTime.isAfter(reservation.startTime) && this.startTime.isBefore(reservation.endTime)) ||
                 (this.endTime.isAfter(reservation.startTime) && this.endTime.isBefore(reservation.endTime)) ||
