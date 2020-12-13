@@ -2,11 +2,12 @@ package io.github.maciejlagowski.airfield.model.service.weather;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.github.maciejlagowski.airfield.AirfieldApplication;
 import io.github.maciejlagowski.airfield.model.dto.WeatherDTO;
 import io.github.maciejlagowski.airfield.model.helper.DateHelper;
 import javassist.NotFoundException;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -30,10 +31,15 @@ public class WeatherApiService {
         this.dtoService = dtoService;
     }
 
-    @Scheduled(fixedRate = 3600000)
+    //    @Scheduled(fixedRate = 3600000)
+    @Bean
     public void updateWeather() throws JsonProcessingException {
-        String result = restTemplate.getForObject(url + apiKey, String.class);
-//        String result = getFakeApi();
+        String result;
+        if (AirfieldApplication.debug) {
+            result = getFakeApi();
+        } else {
+            result = restTemplate.getForObject(url + apiKey, String.class);
+        }
         ObjectMapper objectMapper = new ObjectMapper();
         weather = objectMapper.readValue(result, WeatherApiResponse.class);
         if (weather.getZone().equals(ZoneId.systemDefault())) {

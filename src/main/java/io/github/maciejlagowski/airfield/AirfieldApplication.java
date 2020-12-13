@@ -7,8 +7,6 @@ import io.github.maciejlagowski.airfield.model.enumeration.ERole;
 import io.github.maciejlagowski.airfield.model.enumeration.EStatus;
 import io.github.maciejlagowski.airfield.model.repository.ReservationRepository;
 import io.github.maciejlagowski.airfield.model.repository.UserRepository;
-import io.jsonwebtoken.SignatureAlgorithm;
-import io.jsonwebtoken.security.Keys;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -16,7 +14,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-import javax.crypto.SecretKey;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.LinkedList;
@@ -28,11 +25,11 @@ import java.util.stream.Stream;
 @EnableScheduling
 public class AirfieldApplication {
 
+    public static final boolean debug = false;
+
     public static void main(String[] args) {
         SpringApplication.run(AirfieldApplication.class, args);
     }
-
-    public final static SecretKey keyForHS = Keys.secretKeyFor(SignatureAlgorithm.HS256);
 
     @Bean
     CommandLineRunner init(ReservationRepository reservationRepository, UserRepository userRepository, PasswordEncoder passwordEncoder) {
@@ -60,9 +57,9 @@ public class AirfieldApplication {
                     .build();
             userRepository.save(admin);
             LocalDate localDate = LocalDate.now();
-            for (int i = 0; i < 5; i++) {
+            for (int i = 0; i < 7; i++) {
                 int timeIterator = 7;
-                LocalDate date = localDate.minusDays(i);
+                LocalDate date = localDate.plusDays(2).minusDays(i);
                 for (User user : users) {
                     reservationRepository.save(Reservation.builder()
                             .date(date)

@@ -1,5 +1,6 @@
 package io.github.maciejlagowski.airfield.filter;
 
+import io.github.maciejlagowski.airfield.AirfieldApplication;
 import io.jsonwebtoken.MalformedJwtException;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
@@ -21,8 +22,12 @@ public class ExceptionFilter extends OncePerRequestFilter {
         try {
             filterChain.doFilter(httpServletRequest, httpServletResponse);
         } catch (MalformedJwtException e) {
+            if (AirfieldApplication.debug)
+                e.printStackTrace();
             httpServletResponse.sendError(401, "User not logged in");
         } catch (Exception e) {
+            if (AirfieldApplication.debug)
+                e.printStackTrace();
             httpServletResponse.sendError(500, e.getMessage());
         }
     }

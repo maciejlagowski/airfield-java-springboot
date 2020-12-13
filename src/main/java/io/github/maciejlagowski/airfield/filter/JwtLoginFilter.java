@@ -1,12 +1,9 @@
 package io.github.maciejlagowski.airfield.filter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.github.maciejlagowski.airfield.AirfieldApplication;
 import io.github.maciejlagowski.airfield.model.dto.JwtDTO;
 import io.github.maciejlagowski.airfield.model.dto.UserDTO;
-import io.github.maciejlagowski.airfield.model.entity.User;
-import io.github.maciejlagowski.airfield.model.repository.UserRepository;
-import io.jsonwebtoken.Jwts;
+import io.github.maciejlagowski.airfield.model.service.JwtService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -22,13 +19,12 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Collections;
-import java.util.Date;
 
 @AllArgsConstructor
 public class JwtLoginFilter extends UsernamePasswordAuthenticationFilter {
 
     private final AuthenticationManager authenticationManager;
-    private final UserRepository userService;
+    private final JwtService jwtService;
 
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException {
@@ -48,22 +44,7 @@ public class JwtLoginFilter extends UsernamePasswordAuthenticationFilter {
 
     @Override
     protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authResult) throws IOException, ServletException {
-        User user = userService.findByEmail(authResult.getName()).get();
-
-        long currTime = System.currentTimeMillis();
-        long expirationTime = currTime + 60000 * 60; // 60 minutes expiration
-//        long expirationTime = currTime + 60000 * 15; // 15 minutes expiration
-//        long expirationTime = currTime + 6000; // 6 seconds expiration
-        JwtDTO jwtDTO = new JwtDTO(Jwts.builder()
-                .setSubject(Long.toString(user.getId()))
-                .claim("role", user.getRole())
-                .setIssuedAt(new Date(currTime))
-                .setExpiration(new Date(expirationTime))
-                .signWith(AirfieldApplication.keyForHS)
-                .compact(),
-                expirationTime,
-                user.getRole());
-
+        JwtDTO jwtDTO = jwtService.buildJwt(authResult.getName(), 60);
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.setStatus(HttpStatus.CREATED.value());
         response.getWriter().write(new ObjectMapper().writeValueAsString(jwtDTO));

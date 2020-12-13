@@ -43,7 +43,6 @@ public class ReservationService {
 
     public Reservation createReservation(ReservationDTO reservationDTO) throws NoSuchElementException {
         Reservation reservation;
-        System.err.println(reservationDTO);
         try {
             User user = userRepository.findById(reservationDTO.getUserId()).orElseThrow();
             reservation = Reservation.builder()
@@ -55,8 +54,6 @@ public class ReservationService {
                     .reservationType(reservationDTO.getReservationType())
                     .build();
         } catch (NoSuchElementException e) {
-            //TODO ERROR
-            e.printStackTrace();
             throw new NoSuchElementException("User " + reservationDTO.getUserId() + " doesn't exist");
         }
         return reservation;
@@ -79,11 +76,13 @@ public class ReservationService {
         return reservation;
     }
 
-    public List<ReservationDTO> blackoutList(List<ReservationDTO> reservations) {
+    public List<ReservationDTO> blackoutList(List<ReservationDTO> reservations, Long loggedUserId) {
         List<ReservationDTO> reservationDTOs = new LinkedList<>();
         reservations.forEach(reservation -> {
             EStatus status = reservation.getStatus();
-            if (status.equals(EStatus.ACCEPTED) || status.equals(EStatus.NEW)) {
+            if (reservation.getUserId().equals(loggedUserId)) {
+                reservationDTOs.add(reservation);
+            } else if (status.equals(EStatus.ACCEPTED) || status.equals(EStatus.NEW) || status.equals(EStatus.DONE)) {
                 reservationDTOs.add(
                         blackoutConfidentialData(reservation)
                 );

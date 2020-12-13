@@ -2,10 +2,11 @@ package io.github.maciejlagowski.airfield.configuration;
 
 import io.github.maciejlagowski.airfield.filter.JwtFilter;
 import io.github.maciejlagowski.airfield.filter.JwtLoginFilter;
-import io.github.maciejlagowski.airfield.model.repository.UserRepository;
+import io.github.maciejlagowski.airfield.model.service.JwtService;
 import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
@@ -28,7 +29,17 @@ import java.util.List;
 )
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
-    private final UserRepository userService;
+    private final JwtService jwtService;
+
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
+
+    @Bean
+    public AuthenticationManager getAuthenticationManager() throws Exception {
+        return authenticationManager();
+    }
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
@@ -52,14 +63,10 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 "/configuration/security",
                 "/swagger-ui.html",
                 "/webjars/**",
-                "/weather"
+                "/weather",
+                "/users/register"
 //                , "/**" // TODO delete to activate spring security
         );
-    }
-
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
     }
 
     @Override
@@ -68,9 +75,8 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 //                .and().exceptionHandling().authenticationEntryPoint(authenticationEntryPoint()).and()
                 .and().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and().authorizeRequests().anyRequest().permitAll()
-//                .and().addFilter(new ExceptionFilter())
-                .and().addFilter(new JwtFilter(authenticationManager()))
-                .addFilter(new JwtLoginFilter(authenticationManager(), userService))
+                .and().addFilter(new JwtFilter(authenticationManager(), jwtService))
+                .addFilter(new JwtLoginFilter(authenticationManager(), jwtService))
         ;
 
     }

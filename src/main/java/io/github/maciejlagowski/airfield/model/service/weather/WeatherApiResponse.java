@@ -30,7 +30,7 @@ class WeatherApiResponse {
                 return day;
             }
         }
-        throw new NotFoundException("Cannot get weather on day " + date.toLocalDate());
+        throw new NotFoundException("Cannot get forecast on day " + date.toLocalDate());
     }
 
     public Hourly getHourly(LocalDateTime dateTime) {

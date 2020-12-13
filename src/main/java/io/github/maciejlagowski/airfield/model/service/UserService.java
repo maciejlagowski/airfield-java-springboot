@@ -9,6 +9,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -51,5 +52,23 @@ public class UserService {
         return userRepository.findAll()
                 .stream().map(this::constructDTOFromEntity)
                 .collect(Collectors.toList());
+    }
+
+    public UserDTO getUserById(Long userId) {
+        return constructDTOFromEntity(userRepository.findById(userId)
+                .orElseThrow(() -> new UsernameNotFoundException("Cannot find user in database")));
+    }
+
+    public void update(UserDTO userDTO) {
+        User user = userRepository.findById(userDTO.getId())
+                .orElseThrow(() -> new UsernameNotFoundException("Cannot find user in database"));
+        if (Objects.nonNull(userDTO.getName()))
+            user.setName(userDTO.getName());
+        if (Objects.nonNull(userDTO.getPhoneNumber()))
+            user.setPhoneNumber(userDTO.getPhoneNumber());
+        if (Objects.nonNull(userDTO.getPassword()))
+            user.setPasswordHash(passwordEncoder.encode(userDTO.getPassword()));
+        userRepository.save(user);
+
     }
 }
