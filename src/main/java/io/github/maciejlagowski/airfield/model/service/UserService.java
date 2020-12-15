@@ -9,8 +9,10 @@ import io.github.maciejlagowski.airfield.model.repository.UserRepository;
 import lombok.AllArgsConstructor;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestWrapper;
 import org.springframework.stereotype.Service;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -103,5 +105,15 @@ public class UserService {
 
     public String generateTempPassword() {
         return RandomStringUtils.randomAlphabetic(10);
+    }
+
+    public boolean isUserEmployee(HttpServletRequest request) {
+        SecurityContextHolderAwareRequestWrapper requestWrapper = new SecurityContextHolderAwareRequestWrapper(request, "ROLE_");
+        return (requestWrapper.isUserInRole(ERole.ROLE_EMPLOYEE.name())
+                || requestWrapper.isUserInRole(ERole.ROLE_ADMIN.name()));
+    }
+
+    public void deleteById(Long id) {
+        userRepository.deleteById(id);
     }
 }

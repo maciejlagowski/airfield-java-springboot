@@ -95,4 +95,18 @@ public class UserController {
         String tempPassword = userService.resetPassword(token);
         return "Your new temporary password is '" + tempPassword + "'. Please change it with first login.";
     }
+
+    @DeleteMapping("/users")
+    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
+    @ResponseStatus(HttpStatus.OK)
+    public void deleteUser(@RequestParam Long id, HttpServletRequest request) throws IllegalAccessException {
+        if (!userService.isUserEmployee(request)) {
+            Long userId = jwtService.getUserIdFromJwt(request.getHeader(HttpHeaders.AUTHORIZATION));
+            if (!userId.equals(id)) {
+                throw new IllegalAccessException("User cannot delete another user");
+            }
+        }
+        userService.deleteById(id);
+    }
+
 }

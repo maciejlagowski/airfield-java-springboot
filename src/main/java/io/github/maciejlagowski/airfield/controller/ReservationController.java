@@ -53,12 +53,18 @@ public class ReservationController {
         reservationService.saveWithHoursCheck(reservationDTO);
     }
 
-    @PreAuthorize("hasAnyRole('ADMIN', 'EMPLOYEE')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'EMPLOYEE', 'USER')")
     @PatchMapping("/reservations")
     @ResponseStatus(HttpStatus.OK)
-    void changeReservationStatus(@RequestParam Long id, @RequestParam EStatus status) throws MessagingException {
+    void changeReservationStatus(@RequestParam Long id, @RequestParam EStatus status, HttpServletRequest request) throws MessagingException, IllegalAccessException {
+        UserDTO userToChange = userService.getUserById(reservationService.getReservationById(id).getUserId());
+        if (!userService.isUserEmployee(request)) {
+            Long userId = jwtService.getUserIdFromJwt(request.getHeader(HttpHeaders.AUTHORIZATION));
+            if (!userId.equals(userToChange.getId())) {
+                throw new IllegalAccessException("User cannot modify another user reservation");
+            }
+        }
         reservationStatusService.updateStatus(id, status);
-        UserDTO user = userService.getUserById(reservationService.getReservationById(id).getUserId());
-        emailService.sendReservationStatusChangedNotification(status, user);
+        emailService.sendReservationStatusChangedNotification(status, userToChange);
     }
 }
