@@ -1,5 +1,6 @@
 package io.github.maciejlagowski.airfield.controller;
 
+import io.github.maciejlagowski.airfield.exception.UserNotActiveException;
 import io.github.maciejlagowski.airfield.model.dto.UserDTO;
 import io.github.maciejlagowski.airfield.model.enumeration.ERole;
 import io.github.maciejlagowski.airfield.model.service.EmailService;
@@ -25,10 +26,17 @@ public class UserController {
     private final EmailService emailService;
 
     @PreAuthorize("hasAnyRole('ADMIN', 'EMPLOYEE')")
+    @GetMapping("/users/all")
+    @ResponseStatus(HttpStatus.OK)
+    public List<UserDTO> getAllUsers() {
+        return userService.findAll();
+    }
+
+    @PreAuthorize("hasAnyRole('ADMIN', 'EMPLOYEE')")
     @GetMapping("/users")
     @ResponseStatus(HttpStatus.OK)
-    public List<UserDTO> getUsers() {
-        return userService.findAll();
+    public UserDTO getUser(@RequestParam Long userId) {
+        return userService.getUserById(userId);
     }
 
     @PostMapping("/users/register")
@@ -41,7 +49,6 @@ public class UserController {
         userService.save(user);
     }
 
-    // TODO activation on frontend?
     @GetMapping("/users/activate")
     @ResponseStatus(HttpStatus.OK)
     public String activate(@RequestParam String token) {
@@ -69,4 +76,23 @@ public class UserController {
         }
     }
 
+    @PatchMapping("/users/reset-password")
+    @ResponseStatus(HttpStatus.OK)
+    public void sendResetPasswordLink(@RequestParam String email) throws MessagingException {
+        String token = emailService.generateToken();
+        UserDTO user = userService.getUserByEmail(email);
+        if (user.getRole().equals(ERole.ROLE_INACTIVE)) {
+            throw new UserNotActiveException(user.getEmail());
+        }
+        user.setToken(token);
+        userService.update(user);
+        emailService.sendResetLink(user);
+    }
+
+    @GetMapping("/users/reset-password")
+    @ResponseStatus(HttpStatus.OK)
+    public String resetPassword(@RequestParam String token) {
+        String tempPassword = userService.resetPassword(token);
+        return "Your new temporary password is '" + tempPassword + "'. Please change it with first login.";
+    }
 }

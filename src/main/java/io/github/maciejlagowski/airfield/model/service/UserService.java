@@ -1,11 +1,13 @@
 package io.github.maciejlagowski.airfield.model.service;
 
+import io.github.maciejlagowski.airfield.exception.ObjectAlreadyInDatabaseException;
 import io.github.maciejlagowski.airfield.exception.UserNotFoundException;
 import io.github.maciejlagowski.airfield.model.dto.UserDTO;
 import io.github.maciejlagowski.airfield.model.entity.User;
 import io.github.maciejlagowski.airfield.model.enumeration.ERole;
 import io.github.maciejlagowski.airfield.model.repository.UserRepository;
 import lombok.AllArgsConstructor;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -21,12 +23,17 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
 
     public void save(UserDTO user) {
-        userRepository.save(constructEntityFromDTO(user));
+        try {
+            userRepository.save(constructEntityFromDTO(user));
+        } catch (Exception e) {
+            throw new ObjectAlreadyInDatabaseException("User");
+        }
     }
 
-    public User getUserByEmail(String email) {
-        return userRepository.findByEmail(email)
-                .orElseThrow(() -> new UserNotFoundException(email));
+    public UserDTO getUserByEmail(String email) {
+        return constructDTOFromEntity(
+                userRepository.findByEmail(email)
+                        .orElseThrow(() -> new UserNotFoundException(email)));
     }
 
     public User constructEntityFromDTO(UserDTO userDTO) {
@@ -58,7 +65,7 @@ public class UserService {
 
     public UserDTO getUserById(Long userId) {
         return constructDTOFromEntity(userRepository.findById(userId)
-                .orElseThrow(() -> new UserNotFoundException()));
+                .orElseThrow(UserNotFoundException::new));
     }
 
     public void update(UserDTO userDTO) {
@@ -70,6 +77,8 @@ public class UserService {
             user.setPhoneNumber(userDTO.getPhoneNumber());
         if (Objects.nonNull(userDTO.getPassword()))
             user.setPasswordHash(passwordEncoder.encode(userDTO.getPassword()));
+        if (Objects.nonNull(userDTO.getToken()))
+            user.setToken(userDTO.getToken());
         userRepository.save(user);
 
     }
@@ -80,5 +89,19 @@ public class UserService {
         user.setRole(ERole.ROLE_USER);
         user.setToken(null);
         userRepository.save(user);
+    }
+
+    public String resetPassword(String token) {
+        User user = userRepository.findByToken(token)
+                .orElseThrow(UserNotFoundException::new);
+        String tempPassword = generateTempPassword();
+        user.setPasswordHash(passwordEncoder.encode(tempPassword));
+        user.setToken(null);
+        userRepository.save(user);
+        return tempPassword;
+    }
+
+    public String generateTempPassword() {
+        return RandomStringUtils.randomAlphabetic(10);
     }
 }

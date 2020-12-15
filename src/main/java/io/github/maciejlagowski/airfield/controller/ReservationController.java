@@ -1,11 +1,10 @@
 package io.github.maciejlagowski.airfield.controller;
 
 import io.github.maciejlagowski.airfield.model.dto.ReservationDTO;
+import io.github.maciejlagowski.airfield.model.dto.UserDTO;
 import io.github.maciejlagowski.airfield.model.enumeration.ERole;
 import io.github.maciejlagowski.airfield.model.enumeration.EStatus;
-import io.github.maciejlagowski.airfield.model.service.JwtService;
-import io.github.maciejlagowski.airfield.model.service.ReservationService;
-import io.github.maciejlagowski.airfield.model.service.ReservationStatusService;
+import io.github.maciejlagowski.airfield.model.service.*;
 import lombok.Data;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -13,6 +12,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestWrapper;
 import org.springframework.web.bind.annotation.*;
 
+import javax.mail.MessagingException;
 import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDate;
 import java.util.List;
@@ -25,6 +25,8 @@ public class ReservationController {
     private final ReservationService reservationService;
     private final ReservationStatusService reservationStatusService;
     private final JwtService jwtService;
+    private final EmailService emailService;
+    private final UserService userService;
 
     @PreAuthorize("hasAnyRole('USER', 'ADMIN', 'EMPLOYEE')")
     @GetMapping("/reservations")
@@ -42,13 +44,11 @@ public class ReservationController {
     @PreAuthorize("hasAnyRole('ADMIN', 'USER', 'EMPLOYEE')")
     @PostMapping("/reservations")
     @ResponseStatus(HttpStatus.CREATED)
-    void addReservation(@RequestBody ReservationDTO reservationDTO, HttpServletRequest request) throws IllegalAccessException {
+    void addReservation(@RequestBody ReservationDTO reservationDTO, HttpServletRequest request) {
         SecurityContextHolderAwareRequestWrapper requestWrapper = new SecurityContextHolderAwareRequestWrapper(request, "ROLE_");
         if (requestWrapper.isUserInRole(ERole.ROLE_USER.name())) {
             Long userId = jwtService.getUserIdFromJwt(request.getHeader(HttpHeaders.AUTHORIZATION));
-            if (!userId.equals(reservationDTO.getUserId())) {
-                throw new IllegalAccessException("User is trying to make reservation for another user");
-            }
+            reservationDTO.setUserId(userId);
         }
         reservationService.saveWithHoursCheck(reservationDTO);
     }
@@ -56,7 +56,9 @@ public class ReservationController {
     @PreAuthorize("hasAnyRole('ADMIN', 'EMPLOYEE')")
     @PatchMapping("/reservations")
     @ResponseStatus(HttpStatus.OK)
-    void changeReservationStatus(@RequestParam Long id, @RequestParam EStatus status) {
+    void changeReservationStatus(@RequestParam Long id, @RequestParam EStatus status) throws MessagingException {
         reservationStatusService.updateStatus(id, status);
+        UserDTO user = userService.getUserById(reservationService.getReservationById(id).getUserId());
+        emailService.sendReservationStatusChangedNotification(status, user);
     }
 }

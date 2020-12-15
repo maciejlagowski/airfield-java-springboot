@@ -67,7 +67,8 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 "/webjars/**",
                 "/weather",
                 "/users/register",
-                "/users/activate"
+                "/users/activate",
+                "/users/reset-password"
 //                , "/**" // TODO delete to activate spring security
         );
     }

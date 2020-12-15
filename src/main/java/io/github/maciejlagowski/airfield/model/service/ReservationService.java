@@ -1,5 +1,6 @@
 package io.github.maciejlagowski.airfield.model.service;
 
+import io.github.maciejlagowski.airfield.exception.ReservationNotFoundException;
 import io.github.maciejlagowski.airfield.exception.UserNotFoundException;
 import io.github.maciejlagowski.airfield.model.dto.ReservationDTO;
 import io.github.maciejlagowski.airfield.model.entity.Reservation;
@@ -86,5 +87,10 @@ public class ReservationService {
             }
         });
         return reservationDTOs;
+    }
+
+    public ReservationDTO getReservationById(Long id) {
+        return constructFromEntity(reservationRepository.findById(id)
+                .orElseThrow(ReservationNotFoundException::new));
     }
 }

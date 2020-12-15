@@ -1,7 +1,9 @@
 package io.github.maciejlagowski.airfield.model.service;
 
+import io.github.maciejlagowski.airfield.exception.UserNotFoundException;
 import io.github.maciejlagowski.airfield.model.entity.User;
 import io.github.maciejlagowski.airfield.model.enumeration.ERole;
+import io.github.maciejlagowski.airfield.model.repository.UserRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -15,11 +17,12 @@ import java.util.List;
 @AllArgsConstructor
 public class UserDetailsServiceImpl implements UserDetailsService {
 
-    private final UserService userService;
+    private final UserRepository userRepository;
 
     @Override
     public UserDetails loadUserByUsername(String email) {
-        User user = userService.getUserByEmail(email);
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new UserNotFoundException(email));
         List<GrantedAuthority> authorities = getUserAuthority(user.getRole());
         return buildUserForAuthentication(user, authorities);
     }

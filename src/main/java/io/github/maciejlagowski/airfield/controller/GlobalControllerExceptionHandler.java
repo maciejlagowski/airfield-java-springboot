@@ -1,6 +1,7 @@
 package io.github.maciejlagowski.airfield.controller;
 
 import io.github.maciejlagowski.airfield.AirfieldApplication;
+import io.github.maciejlagowski.airfield.exception.ObjectAlreadyInDatabaseException;
 import io.github.maciejlagowski.airfield.exception.UserNotFoundException;
 import javassist.NotFoundException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -27,8 +28,8 @@ public class GlobalControllerExceptionHandler {
         httpServletResponse.sendError(401, "User login problem, please try to logout and login again");
     }
 
-    @ExceptionHandler(IllegalAccessException.class)
-    public void handleIllegalAccessException(HttpServletResponse httpServletResponse, IllegalAccessException e) throws IOException {
+    @ExceptionHandler({IllegalAccessException.class, ObjectAlreadyInDatabaseException.class})
+    public void handleIllegalAccessException(HttpServletResponse httpServletResponse, Exception e) throws IOException {
         if (AirfieldApplication.debug)
             e.printStackTrace();
         httpServletResponse.sendError(400, e.getMessage());

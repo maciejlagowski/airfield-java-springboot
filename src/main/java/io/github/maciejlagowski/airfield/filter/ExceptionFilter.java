@@ -1,6 +1,7 @@
 package io.github.maciejlagowski.airfield.filter;
 
 import io.github.maciejlagowski.airfield.AirfieldApplication;
+import io.github.maciejlagowski.airfield.exception.UserNotActiveException;
 import io.jsonwebtoken.MalformedJwtException;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
@@ -25,6 +26,10 @@ public class ExceptionFilter extends OncePerRequestFilter {
             if (AirfieldApplication.debug)
                 e.printStackTrace();
             httpServletResponse.sendError(401, "User not logged in");
+        } catch (UserNotActiveException e) {
+            if (AirfieldApplication.debug)
+                e.printStackTrace();
+            httpServletResponse.sendError(401, e.getMessage());
         } catch (Exception e) {
             if (AirfieldApplication.debug)
                 e.printStackTrace();
