@@ -57,6 +57,7 @@ public class JwtService {
                 .signWith(signKey)
                 .compact(),
                 expirationTime,
-                user.getRole());
+                user.getRole(),
+                user.getName());
     }
 }

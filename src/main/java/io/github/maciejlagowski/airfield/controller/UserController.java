@@ -25,11 +25,14 @@ public class UserController {
     private final JwtService jwtService;
     private final EmailService emailService;
 
-    @PreAuthorize("hasAnyRole('ADMIN', 'EMPLOYEE')")
-    @GetMapping("/users/all")
+    @PostMapping("/users/register")
     @ResponseStatus(HttpStatus.OK)
-    public List<UserDTO> getAllUsers() {
-        return userService.findAll();
+    public void register(@RequestBody UserDTO user) throws MessagingException {
+        String token = emailService.generateToken();
+        user.setToken(token);
+        user.setRole(ERole.ROLE_INACTIVE);
+        emailService.sendActivationLink(user);
+        userService.save(user);
     }
 
     @PreAuthorize("hasAnyRole('ADMIN', 'EMPLOYEE')")
@@ -39,14 +42,42 @@ public class UserController {
         return userService.getUserById(userId);
     }
 
-    @PostMapping("/users/register")
+    @PutMapping("/users")
+    @PreAuthorize("hasAnyRole('USER', 'EMPLOYEE', 'ADMIN')")
     @ResponseStatus(HttpStatus.OK)
-    public void register(@RequestBody UserDTO user) throws MessagingException {
-        String token = emailService.generateToken();
-        user.setToken(token);
-        user.setRole(ERole.ROLE_INACTIVE);
-        emailService.sendActivationLink(user);
-        userService.save(user);
+    public void updateUser(@RequestBody UserDTO user, HttpServletRequest request) throws IllegalAccessException {
+        Long userId = jwtService.getUserIdFromJwt(request.getHeader(HttpHeaders.AUTHORIZATION));
+        if (!userService.getRole(request).equals(ERole.ROLE_ADMIN) && !userId.equals(user.getId())) {
+            throw new IllegalAccessException("User is trying to update another user");
+        }
+        userService.update(user);
+    }
+
+    @PatchMapping("/users")
+    @PreAuthorize("hasRole('ADMIN')")
+    @ResponseStatus(HttpStatus.OK)
+    public void updateUserRole(@RequestBody UserDTO user) {
+        userService.updateRole(user);
+    }
+
+    @DeleteMapping("/users")
+    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
+    @ResponseStatus(HttpStatus.OK)
+    public void deleteUser(@RequestParam Long id, HttpServletRequest request) throws IllegalAccessException {
+        if (userService.isRegularUser(request)) {
+            Long userId = jwtService.getUserIdFromJwt(request.getHeader(HttpHeaders.AUTHORIZATION));
+            if (!userId.equals(id)) {
+                throw new IllegalAccessException("User cannot delete another user");
+            }
+        }
+        userService.deleteById(id);
+    }
+
+    @PreAuthorize("hasAnyRole('ADMIN', 'EMPLOYEE')")
+    @GetMapping("/users/all")
+    @ResponseStatus(HttpStatus.OK)
+    public List<UserDTO> getAllUsers() {
+        return userService.findAll();
     }
 
     @GetMapping("/users/activate")
@@ -62,18 +93,6 @@ public class UserController {
     public UserDTO getLoggedUser(HttpServletRequest request) {
         Long userId = jwtService.getUserIdFromJwt(request.getHeader(HttpHeaders.AUTHORIZATION));
         return userService.getUserById(userId);
-    }
-
-    @PutMapping("/users")
-    @PreAuthorize("hasAnyRole('USER', 'EMPLOYEE', 'ADMIN')")
-    @ResponseStatus(HttpStatus.OK)
-    public void updateUser(@RequestBody UserDTO user, HttpServletRequest request) throws IllegalAccessException {
-        Long userId = jwtService.getUserIdFromJwt(request.getHeader(HttpHeaders.AUTHORIZATION));
-        if (userId.equals(user.getId())) {
-            userService.update(user);
-        } else {
-            throw new IllegalAccessException("User is trying to update another user");
-        }
     }
 
     @PatchMapping("/users/reset-password")
@@ -95,18 +114,4 @@ public class UserController {
         String tempPassword = userService.resetPassword(token);
         return "Your new temporary password is '" + tempPassword + "'. Please change it with first login.";
     }
-
-    @DeleteMapping("/users")
-    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
-    @ResponseStatus(HttpStatus.OK)
-    public void deleteUser(@RequestParam Long id, HttpServletRequest request) throws IllegalAccessException {
-        if (!userService.isUserEmployee(request)) {
-            Long userId = jwtService.getUserIdFromJwt(request.getHeader(HttpHeaders.AUTHORIZATION));
-            if (!userId.equals(id)) {
-                throw new IllegalAccessException("User cannot delete another user");
-            }
-        }
-        userService.deleteById(id);
-    }
-
 }

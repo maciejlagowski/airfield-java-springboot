@@ -12,4 +12,5 @@ public class JwtDTO {
     private String token;
     private Long expirationTime;
     private ERole role;
+    private String name;
 }

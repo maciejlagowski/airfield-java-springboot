@@ -58,7 +58,7 @@ public class ReservationController {
     @ResponseStatus(HttpStatus.OK)
     void changeReservationStatus(@RequestParam Long id, @RequestParam EStatus status, HttpServletRequest request) throws MessagingException, IllegalAccessException {
         UserDTO userToChange = userService.getUserById(reservationService.getReservationById(id).getUserId());
-        if (!userService.isUserEmployee(request)) {
+        if (userService.isRegularUser(request)) {
             Long userId = jwtService.getUserIdFromJwt(request.getHeader(HttpHeaders.AUTHORIZATION));
             if (!userId.equals(userToChange.getId())) {
                 throw new IllegalAccessException("User cannot modify another user reservation");

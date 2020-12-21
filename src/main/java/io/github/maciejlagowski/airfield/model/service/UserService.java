@@ -82,7 +82,6 @@ public class UserService {
         if (Objects.nonNull(userDTO.getToken()))
             user.setToken(userDTO.getToken());
         userRepository.save(user);
-
     }
 
     public void activateUser(String token) {
@@ -107,13 +106,30 @@ public class UserService {
         return RandomStringUtils.randomAlphabetic(10);
     }
 
-    public boolean isUserEmployee(HttpServletRequest request) {
+    public boolean isRegularUser(HttpServletRequest request) {
         SecurityContextHolderAwareRequestWrapper requestWrapper = new SecurityContextHolderAwareRequestWrapper(request, "ROLE_");
-        return (requestWrapper.isUserInRole(ERole.ROLE_EMPLOYEE.name())
-                || requestWrapper.isUserInRole(ERole.ROLE_ADMIN.name()));
+        return requestWrapper.isUserInRole(ERole.ROLE_USER.name());
     }
 
     public void deleteById(Long id) {
         userRepository.deleteById(id);
+    }
+
+    public ERole getRole(HttpServletRequest request) {
+        SecurityContextHolderAwareRequestWrapper requestWrapper = new SecurityContextHolderAwareRequestWrapper(request, "ROLE_");
+        for (ERole role : ERole.values()) {
+            if (requestWrapper.isUserInRole(role.name())) {
+                return role;
+            }
+        }
+        return ERole.ROLE_NOT_LOGGED;
+    }
+
+    public void updateRole(UserDTO userDTO) {
+        User user = userRepository.findById(userDTO.getId())
+                .orElseThrow(UserNotFoundException::new);
+        if (Objects.nonNull(userDTO.getRole()))
+            user.setRole(userDTO.getRole());
+        userRepository.save(user);
     }
 }
