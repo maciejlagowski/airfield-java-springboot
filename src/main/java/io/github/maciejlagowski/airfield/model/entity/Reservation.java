@@ -41,7 +41,8 @@ public class Reservation {
         return (this.startTime.isAfter(reservation.startTime) && this.startTime.isBefore(reservation.endTime)) ||
                 (this.endTime.isAfter(reservation.startTime) && this.endTime.isBefore(reservation.endTime)) ||
                 (this.startTime.isBefore(reservation.startTime) && this.endTime.isAfter(reservation.endTime)) ||
-                (reservation.startTime.isBefore(this.startTime) && reservation.endTime.isAfter(this.endTime));
+                (reservation.startTime.isBefore(this.startTime) && reservation.endTime.isAfter(this.endTime)) ||
+                (reservation.startTime.equals(this.startTime) && reservation.endTime.equals(this.endTime));
 
     }
 }
