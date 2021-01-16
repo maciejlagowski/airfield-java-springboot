@@ -2,6 +2,7 @@ package io.github.maciejlagowski.airfield.model.service.weather;
 
 import io.github.maciejlagowski.airfield.model.dto.WeatherAlertDTO;
 import io.github.maciejlagowski.airfield.model.dto.WeatherDTO;
+import io.github.maciejlagowski.airfield.model.enumeration.EAlertImpact;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -47,6 +48,7 @@ public class WeatherDTOService {
                 .description(alert.getDescription())
                 .startTime(alert.getStartTime())
                 .endTime(alert.getEndTime())
+                .alertImpact(EAlertImpact.getImpactFromString(alert.getEvent()))
                 .build();
     }
 }

@@ -1,5 +1,6 @@
 package io.github.maciejlagowski.airfield.model.dto;
 
+import io.github.maciejlagowski.airfield.model.enumeration.EAlertImpact;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -17,4 +18,5 @@ public class WeatherAlertDTO {
     private LocalDateTime startTime;
     private LocalDateTime endTime;
     private String description;
+    private EAlertImpact alertImpact;
 }

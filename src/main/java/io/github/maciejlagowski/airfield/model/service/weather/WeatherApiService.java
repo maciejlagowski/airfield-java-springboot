@@ -43,6 +43,7 @@ public class WeatherApiService {
             result = restTemplate.getForObject(url + apiKey, String.class);
         }
         ObjectMapper objectMapper = new ObjectMapper();
+        System.out.println(result);
         weather = objectMapper.readValue(result, WeatherApiResponse.class);
         if (weather.getZone().equals(ZoneId.systemDefault())) {
             System.out.println("Weather updated");
