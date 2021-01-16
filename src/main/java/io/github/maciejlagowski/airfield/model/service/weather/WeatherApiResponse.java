@@ -7,6 +7,7 @@ import lombok.Data;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.LinkedList;
 import java.util.List;
 
 @Data
@@ -23,6 +24,7 @@ class WeatherApiResponse {
     private List<Hourly> hours;
     @JsonProperty("daily")
     private List<Daily> days;
+    private List<Alert> alerts = new LinkedList<>();
 
     public Daily getDaily(LocalDateTime date) throws NotFoundException {
         for (Daily day : days) {

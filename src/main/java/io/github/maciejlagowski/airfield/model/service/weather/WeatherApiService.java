@@ -3,11 +3,12 @@ package io.github.maciejlagowski.airfield.model.service.weather;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.maciejlagowski.airfield.AirfieldApplication;
+import io.github.maciejlagowski.airfield.model.dto.WeatherAlertDTO;
 import io.github.maciejlagowski.airfield.model.dto.WeatherDTO;
 import io.github.maciejlagowski.airfield.model.helper.DateHelper;
 import javassist.NotFoundException;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Bean;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -16,6 +17,8 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.zone.ZoneRulesException;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class WeatherApiService {
@@ -31,8 +34,7 @@ public class WeatherApiService {
         this.dtoService = dtoService;
     }
 
-    //    @Scheduled(fixedRate = 3600000)
-    @Bean
+    @Scheduled(fixedRate = 3600000)
     public void updateWeather() throws JsonProcessingException {
         String result;
         if (AirfieldApplication.debug) {
@@ -53,6 +55,10 @@ public class WeatherApiService {
         return dtoService.constructFromDaily(
                 weather.getDaily(date)
         );
+    }
+
+    public List<WeatherAlertDTO> getAlerts() {
+        return weather.getAlerts().stream().map(dtoService::constructAlert).collect(Collectors.toList());
     }
 
     public WeatherDTO getWeatherOnHour(LocalDateTime dateTime) {
@@ -88,6 +94,7 @@ public class WeatherApiService {
                 "dt\":" + (unixTime + 345600) + ",\"sunrise\":1605765855,\"sunset\":1605796734,\"temp\":{\"day\":6.69,\"min\":4.75,\"max\":9.71,\"night\":6.92,\"eve\":8.79,\"morn\":5.29},\"feels_like\":{\"day\":1.52,\"night\":2.21,\"eve\":4.17,\"morn\":0.7},\"pressure\":1022,\"humidity\":78,\"dew_point\":3.17,\"wind_speed\":5.27,\"wind_deg\":164,\"weather\":[{\"id\":800,\"main\":\"Clear\",\"description\":\"clear sky\",\"icon\":\"01d\"}],\"clouds\":2,\"pop\":0,\"uvi\":0.8},{\"" +
                 "dt\":" + (unixTime + 432000) + ",\"sunrise\":1605852358,\"sunset\":1605883061,\"temp\":{\"day\":7.47,\"min\":3.25,\"max\":7.95,\"night\":3.25,\"eve\":5.64,\"morn\":7.71},\"feels_like\":{\"day\":2.43,\"night\":-1.16,\"eve\":1.14,\"morn\":4.03},\"pressure\":1016,\"humidity\":74,\"dew_point\":3.17,\"wind_speed\":5.09,\"wind_deg\":268,\"weather\":[{\"id\":500,\"main\":\"Rain\",\"description\":\"light rain\",\"icon\":\"10d\"}],\"clouds\":100,\"pop\":1,\"rain\":1.39,\"uvi\":0.64},{\"" +
                 "dt\":" + (unixTime + 518400) + ",\"sunrise\":1605938859,\"sunset\":1605969391,\"temp\":{\"day\":1.97,\"min\":0.39,\"max\":3.9,\"night\":1.05,\"eve\":2.72,\"morn\":1.17},\"feels_like\":{\"day\":-3.13,\"night\":-3.43,\"eve\":-2.2,\"morn\":-3.39},\"pressure\":1024,\"humidity\":82,\"dew_point\":-3.15,\"wind_speed\":4.29,\"wind_deg\":262,\"weather\":[{\"id\":800,\"main\":\"Clear\",\"description\":\"clear sky\",\"icon\":\"01d\"}],\"clouds\":0,\"pop\":0,\"uvi\":0.59},{\"" +
-                "dt\":" + (unixTime + 604800) + ",\"sunrise\":1606025359,\"sunset\":1606055723,\"temp\":{\"day\":4.26,\"min\":1.06,\"max\":5.79,\"night\":5.79,\"eve\":5.4,\"morn\":1.37},\"feels_like\":{\"day\":-2.47,\"night\":-0.58,\"eve\":-0.21,\"morn\":-4.85},\"pressure\":1020,\"humidity\":63,\"dew_point\":-7.94,\"wind_speed\":6.36,\"wind_deg\":207,\"weather\":[{\"id\":500,\"main\":\"Rain\",\"description\":\"light rain\",\"icon\":\"10d\"}],\"clouds\":100,\"pop\":0.58,\"rain\":0.51,\"uvi\":0.59}]}";
+                "dt\":" + (unixTime + 604800) + ",\"sunrise\":1606025359,\"sunset\":1606055723,\"temp\":{\"day\":4.26,\"min\":1.06,\"max\":5.79,\"night\":5.79,\"eve\":5.4,\"morn\":1.37},\"feels_like\":{\"day\":-2.47,\"night\":-0.58,\"eve\":-0.21,\"morn\":-4.85},\"pressure\":1020,\"humidity\":63,\"dew_point\":-7.94,\"wind_speed\":6.36,\"wind_deg\":207,\"weather\":[{\"id\":500,\"main\":\"Rain\",\"description\":\"light rain\",\"icon\":\"10d\"}],\"clouds\":100,\"pop\":0.58,\"rain\":0.51,\"uvi\":0.59}]" +
+                ",\"alerts\": [{\"sender_name\": \"IMGW-PIB Centralne Biuro Prognoz Meteorologicznych - Wydział w Warszawie\",\"event\": \"Yellow snow-ice warning\",\"start\": " + unixTime + ", \"end\": " + (3600 * 5 + unixTime) + ",\"description\": \"Blizzards are expected caused by wind with mean speed between 25 km/h and 40 km/h, and gusts locally up to 60 km/h together with light snowfall.\"}]}";
     }
 }

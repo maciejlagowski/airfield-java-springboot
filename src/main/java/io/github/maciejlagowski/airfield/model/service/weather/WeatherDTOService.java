@@ -1,5 +1,6 @@
 package io.github.maciejlagowski.airfield.model.service.weather;
 
+import io.github.maciejlagowski.airfield.model.dto.WeatherAlertDTO;
 import io.github.maciejlagowski.airfield.model.dto.WeatherDTO;
 import org.springframework.stereotype.Service;
 
@@ -37,5 +38,15 @@ public class WeatherDTOService {
         weatherDTO.setFeelsLikeMorningTemp(daily.getFeelsLikeTemp().getMorn());
         weatherDTO.setDayTemp(daily.getTemperature().getDay());
         return weatherDTO;
+    }
+
+    public WeatherAlertDTO constructAlert(Alert alert) {
+        return WeatherAlertDTO.builder()
+                .senderName(alert.getSenderName())
+                .event(alert.getEvent())
+                .description(alert.getDescription())
+                .startTime(alert.getStartTime())
+                .endTime(alert.getEndTime())
+                .build();
     }
 }
