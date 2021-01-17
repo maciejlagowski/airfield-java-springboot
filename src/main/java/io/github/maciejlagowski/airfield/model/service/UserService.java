@@ -24,10 +24,12 @@ public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
-    public void save(UserDTO user) {
+    public User save(UserDTO user) {
         try {
-            userRepository.save(constructEntityFromDTO(user));
+            return userRepository.save(constructEntityFromDTO(user));
         } catch (Exception e) {
+            e.printStackTrace();
+            System.err.println(user);
             throw new ObjectAlreadyInDatabaseException("User");
         }
     }
@@ -70,7 +72,7 @@ public class UserService {
                 .orElseThrow(UserNotFoundException::new));
     }
 
-    public void update(UserDTO userDTO) {
+    public User update(UserDTO userDTO) {
         User user = userRepository.findById(userDTO.getId())
                 .orElseThrow(UserNotFoundException::new);
         if (Objects.nonNull(userDTO.getName()))
@@ -81,15 +83,15 @@ public class UserService {
             user.setPasswordHash(passwordEncoder.encode(userDTO.getPassword()));
         if (Objects.nonNull(userDTO.getToken()))
             user.setToken(userDTO.getToken());
-        userRepository.save(user);
+        return userRepository.save(user);
     }
 
-    public void activateUser(String token) {
+    public User activateUser(String token) {
         User user = userRepository.findByToken(token)
                 .orElseThrow(UserNotFoundException::new);
         user.setRole(ERole.ROLE_USER);
         user.setToken(null);
-        userRepository.save(user);
+        return userRepository.save(user);
     }
 
     public String resetPassword(String token) {
@@ -106,13 +108,14 @@ public class UserService {
         return RandomStringUtils.randomAlphabetic(10);
     }
 
-    public boolean isRegularUser(HttpServletRequest request) {
-        SecurityContextHolderAwareRequestWrapper requestWrapper = new SecurityContextHolderAwareRequestWrapper(request, "ROLE_");
-        return requestWrapper.isUserInRole(ERole.ROLE_USER.name());
+    public boolean isRegularUser(Long id) {
+        User user = userRepository.findById(id).orElseThrow(() -> new UserNotFoundException(id.toString()));
+        return user.getRole().equals(ERole.ROLE_USER);
     }
 
-    public void deleteById(Long id) {
+    public Long deleteById(Long id) {
         userRepository.deleteById(id);
+        return id;
     }
 
     public ERole getRole(HttpServletRequest request) {
@@ -125,11 +128,11 @@ public class UserService {
         return ERole.ROLE_NOT_LOGGED;
     }
 
-    public void updateRole(UserDTO userDTO) {
+    public User updateRole(UserDTO userDTO) {
         User user = userRepository.findById(userDTO.getId())
                 .orElseThrow(UserNotFoundException::new);
         if (Objects.nonNull(userDTO.getRole()))
             user.setRole(userDTO.getRole());
-        userRepository.save(user);
+        return userRepository.save(user);
     }
 }

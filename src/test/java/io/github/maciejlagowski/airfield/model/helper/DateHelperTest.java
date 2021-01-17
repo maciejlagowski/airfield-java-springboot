@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Test;
 
 import java.time.LocalDateTime;
 
-class DateHelperTests {
+class DateHelperTest {
 
     @Test
     void shouldConvertUnixTimeToLocalDateTime() {

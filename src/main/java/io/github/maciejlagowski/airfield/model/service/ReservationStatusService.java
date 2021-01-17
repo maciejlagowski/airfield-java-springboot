@@ -21,15 +21,16 @@ public class ReservationStatusService {
             EStatus properStatus = checkWhatStatusShouldBe(reservation);
             if (!properStatus.equals(reservation.getStatus())) {
                 updateStatus(reservation.getId(), properStatus);
-            }
+            } // TODO tests
         });
     }
 
-    public void updateStatus(Long id, EStatus status) {
+    public Long updateStatus(Long id, EStatus status) {
         reservationRepository.updateStatus(id, status);
+        return id;
     }
 
-    private EStatus checkWhatStatusShouldBe(Reservation reservation) {
+    public EStatus checkWhatStatusShouldBe(Reservation reservation) {
         EStatus status = reservation.getStatus();
         switch (status) {
             case NEW:
