@@ -20,11 +20,11 @@ public interface ReservationRepository extends CrudRepository<Reservation, Long>
 
     default void saveWithHoursCheck(Reservation reservation) {
         List<Reservation> reservations = findAllByDateOrderByStartTime(reservation.getDate());
-        for (Reservation reservationFromDB : reservations) {
-            if (reservation.collides(reservationFromDB)) {
-                throw new IllegalArgumentException("Reservation time collides with already reserved elements");
-            }
-        }
+//        for (Reservation reservationFromDB : reservations) {
+//            if (reservation.collides(reservationFromDB)) {
+//                throw new IllegalArgumentException("Reservation time collides with already reserved elements");
+//            }
+//        }
         save(reservation);
     }
 
