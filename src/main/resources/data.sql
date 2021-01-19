@@ -19,7 +19,7 @@ INSERT INTO airfield.user (id, email, name, password_hash, phone_number, role, t
 VALUES (6, 'admin@admin.com', 'Admin', '$2a$10$Al9pIvWU1UMRuSLrmRBnDe38nwS2nWDLlWAy9kEuCaBdaDJyUqouW', '666666666',
         'ROLE_ADMIN', null);
 
--- RESERVATIONS TODO zrobic to lepiej (daty itd)
+-- RESERVATIONS
 
 INSERT INTO airfield.reservation (id, date, end_time, reservation_type, start_time, status, user_id)
 VALUES (1, '2021-01-19', '08:00:00', 'OTHER', '07:00:00', 'CANCELLED', 1);

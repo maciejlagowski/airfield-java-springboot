@@ -16,7 +16,7 @@ public class ReservationStatusService {
     private final ReservationRepository reservationRepository;
 
     @Scheduled(fixedDelay = 60000)  // One minute scheduling
-    public void checkAndUpdateReservationsStatus() { // TODO tylko na dany dzien
+    public void checkAndUpdateReservationsStatus() { // TODO only for one day
         reservationRepository.findAll().forEach(reservation -> {
             EStatus properStatus = checkWhatStatusShouldBe(reservation);
             if (!properStatus.equals(reservation.getStatus())) {

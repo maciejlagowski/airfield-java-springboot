@@ -43,11 +43,11 @@ class ReservationServiceTest {
 
     @Test
     void shouldConvertReservationsBothWay() {
-        Reservation reservation = buildReservation(5L);
+        Reservation reservation = buildReservation(0L);
         ReservationDTO reservationDTO = reservationService.constructFromEntity(reservation);
         Reservation reservationAfterConversion = reservationService.createReservation(reservationDTO);
 
-        ReservationDTO reservationDTO1 = buildReservationDTO(5L);
+        ReservationDTO reservationDTO1 = buildReservationDTO(0L);
         Reservation reservation1 = reservationService.createReservation(reservationDTO1);
         ReservationDTO reservationDTO1AfterConversion = reservationService.constructFromEntity(reservation1);
 
@@ -59,7 +59,7 @@ class ReservationServiceTest {
     void shouldConvertListOfReservations() {
         List<Reservation> reservations = new LinkedList<>();
         for (int i = 0; i < 5; i++) {
-            reservations.add(buildReservation((long) i));
+            reservations.add(buildReservation(0L));
         }
 
         List<ReservationDTO> reservationDTOs = reservationService.reservationListToDTOList(reservations);

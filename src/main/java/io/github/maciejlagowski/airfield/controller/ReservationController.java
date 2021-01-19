@@ -27,21 +27,9 @@ public class ReservationController {
     private final EmailService emailService;
     private final UserService userService;
 
-    @PreAuthorize("hasAnyRole('USER', 'ADMIN', 'EMPLOYEE')")
-    @GetMapping("/reservations")
-    @ResponseStatus(HttpStatus.OK)
-    public List<ReservationDTO> getReservations(@RequestParam String date, HttpServletRequest request) {
-        Long loggedUserId = this.jwtService.getUserIdFromJwt(request.getHeader(HttpHeaders.AUTHORIZATION));
-        List<ReservationDTO> reservations = reservationService.findAllByDateOrdered(LocalDate.parse(date));
-        if (userService.isRegularUser(loggedUserId)) {
-            reservations = reservationService.blackoutList(reservations, loggedUserId);
-        }
-        return reservations;
-    }
-
-    @PreAuthorize("hasAnyRole('ADMIN', 'USER', 'EMPLOYEE')")
     @PostMapping("/reservations")
     @ResponseStatus(HttpStatus.CREATED)
+    @PreAuthorize("hasAnyRole('ADMIN', 'USER', 'EMPLOYEE')")
     public Reservation addReservation(@RequestBody ReservationDTO reservationDTO, HttpServletRequest request) {
         Long userId = jwtService.getUserIdFromJwt(request.getHeader(HttpHeaders.AUTHORIZATION));
         if (userService.isRegularUser(userId)) {
@@ -50,10 +38,24 @@ public class ReservationController {
         return reservationService.saveWithHoursCheck(reservationDTO);
     }
 
-    @PreAuthorize("hasAnyRole('ADMIN', 'EMPLOYEE', 'USER')")
-    @PatchMapping("/reservations")
+    @GetMapping("/reservations/{date}")
     @ResponseStatus(HttpStatus.OK)
-    public Long changeReservationStatus(@RequestParam Long id, @RequestParam EStatus status, HttpServletRequest request) throws MessagingException, IllegalAccessException {
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN', 'EMPLOYEE')")
+    public List<ReservationDTO> getReservations(@PathVariable String date, HttpServletRequest request) {
+        List<ReservationDTO> reservations = reservationService.findAllByDateOrdered(LocalDate.parse(date));
+
+        Long loggedUserId = jwtService.getUserIdFromJwt(request.getHeader(HttpHeaders.AUTHORIZATION));
+        if (userService.isRegularUser(loggedUserId)) {
+            reservations = reservationService.blackoutList(reservations, loggedUserId);
+        }
+
+        return reservations;
+    }
+
+    @PatchMapping("/reservations/{id}/status")
+    @ResponseStatus(HttpStatus.OK)
+    @PreAuthorize("hasAnyRole('ADMIN', 'EMPLOYEE', 'USER')")
+    public Long changeReservationStatus(@PathVariable Long id, @RequestParam EStatus status, HttpServletRequest request) throws MessagingException, IllegalAccessException {
         UserDTO userToChange = userService.getUserById(reservationService.getReservationById(id).getUserId());
         Long userId = jwtService.getUserIdFromJwt(request.getHeader(HttpHeaders.AUTHORIZATION));
         if (userService.isRegularUser(userId)) {

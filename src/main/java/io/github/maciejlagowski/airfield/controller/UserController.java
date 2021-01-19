@@ -26,6 +26,20 @@ public class UserController {
     private final JwtService jwtService;
     private final EmailService emailService;
 
+    @GetMapping("/users")
+    @ResponseStatus(HttpStatus.OK)
+    @PreAuthorize("hasAnyRole('ADMIN', 'EMPLOYEE')")
+    public List<UserDTO> getAllUsers() {
+        return userService.findAll();
+    }
+
+    @GetMapping("/users/{id}")
+    @ResponseStatus(HttpStatus.OK)
+    @PreAuthorize("hasAnyRole('ADMIN', 'EMPLOYEE')")
+    public UserDTO getUser(@PathVariable Long id) {
+        return userService.getUserById(id);
+    }
+
     @PostMapping("/users/register")
     @ResponseStatus(HttpStatus.OK)
     public User register(@RequestBody UserDTO user) throws MessagingException {
@@ -37,35 +51,21 @@ public class UserController {
         return savedUser;
     }
 
-    @PreAuthorize("hasAnyRole('ADMIN', 'EMPLOYEE')")
-    @GetMapping("/users")
+    @PutMapping("/users/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public UserDTO getUser(@RequestParam Long userId) {
-        return userService.getUserById(userId);
-    }
-
-    @PutMapping("/users")
     @PreAuthorize("hasAnyRole('USER', 'EMPLOYEE', 'ADMIN')")
-    @ResponseStatus(HttpStatus.OK)
-    public User updateUser(@RequestBody UserDTO user, HttpServletRequest request) throws IllegalAccessException {
+    public User updateUser(@PathVariable Long id, @RequestBody UserDTO user, HttpServletRequest request) throws IllegalAccessException {
         Long userId = jwtService.getUserIdFromJwt(request.getHeader(HttpHeaders.AUTHORIZATION));
-        if (!userService.getRole(request).equals(ERole.ROLE_ADMIN) && !userId.equals(user.getId())) {
+        if (!userService.getRole(request).equals(ERole.ROLE_ADMIN) && !userId.equals(id)) {
             throw new IllegalAccessException("User is trying to update another user");
         }
         return userService.update(user);
     }
 
-    @PatchMapping("/users")
-    @PreAuthorize("hasRole('ADMIN')")
+    @DeleteMapping("/users/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public User updateUserRole(@RequestBody UserDTO user) {
-        return userService.updateRole(user);
-    }
-
-    @DeleteMapping("/users")
     @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
-    @ResponseStatus(HttpStatus.OK)
-    public Long deleteUser(@RequestParam Long id, HttpServletRequest request) throws IllegalAccessException {
+    public Long deleteUser(@PathVariable Long id, HttpServletRequest request) throws IllegalAccessException {
         Long userId = jwtService.getUserIdFromJwt(request.getHeader(HttpHeaders.AUTHORIZATION));
         if (userService.isRegularUser(userId)) {
             if (!userId.equals(id)) {
@@ -75,11 +75,12 @@ public class UserController {
         return userService.deleteById(id);
     }
 
-    @PreAuthorize("hasAnyRole('ADMIN', 'EMPLOYEE')")
-    @GetMapping("/users/all")
+    @PatchMapping("/users/{id}/role")
     @ResponseStatus(HttpStatus.OK)
-    public List<UserDTO> getAllUsers() {
-        return userService.findAll();
+    @PreAuthorize("hasRole('ADMIN')")
+    public User updateUserRole(@PathVariable Long id, @RequestBody UserDTO user) {
+        user.setId(id);
+        return userService.updateRole(user);
     }
 
     @GetMapping("/users/activate")
@@ -90,8 +91,8 @@ public class UserController {
     }
 
     @GetMapping("/users/logged")
-    @PreAuthorize("hasAnyRole('USER', 'ADMIN', 'EMPLOYEE')")
     @ResponseStatus(HttpStatus.OK)
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN', 'EMPLOYEE')")
     public UserDTO getLoggedUser(HttpServletRequest request) {
         Long userId = jwtService.getUserIdFromJwt(request.getHeader(HttpHeaders.AUTHORIZATION));
         return userService.getUserById(userId);

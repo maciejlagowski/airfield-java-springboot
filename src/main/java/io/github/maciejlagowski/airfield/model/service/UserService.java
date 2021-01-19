@@ -28,8 +28,6 @@ public class UserService {
         try {
             return userRepository.save(constructEntityFromDTO(user));
         } catch (Exception e) {
-            e.printStackTrace();
-            System.err.println(user);
             throw new ObjectAlreadyInDatabaseException("User");
         }
     }

@@ -42,7 +42,7 @@ class UserControllerTest {
     void shouldUpdateUser() throws IllegalAccessException {
         UserDTO userDTO = buildUserDTO(0L);
 
-        User user = userController.updateUser(userDTO, mock(HttpServletRequest.class));
+        User user = userController.updateUser(0L, userDTO, mock(HttpServletRequest.class));
 
         assertEquals(userDTO.getName(), user.getName());
         assertEquals(userDTO.getPhoneNumber(), user.getPhoneNumber());
@@ -50,18 +50,15 @@ class UserControllerTest {
 
     @Test
     void shouldThrowIllegalAccessOnUpdateUser() {
-        UserDTO userDTO = buildUserDTO(0L);
-        userDTO.setId(5L);
-
         assertThrows(IllegalAccessException.class,
-                () -> userController.updateUser(userDTO, mock(HttpServletRequest.class)));
+                () -> userController.updateUser(5L, buildUserDTO(5L), mock(HttpServletRequest.class)));
     }
 
     @Test
     void shouldUpdateUserRole() {
         UserDTO userDTO = buildUserDTO(0L);
 
-        User user = userController.updateUserRole(userDTO);
+        User user = userController.updateUserRole(0L, userDTO);
 
         assertEquals(userDTO.getRole(), user.getRole());
     }
@@ -123,12 +120,12 @@ class UserControllerTest {
 
     @Test
     void shouldConvertUsersBothWay() {
-        User user = buildUser(5L);
+        User user = buildUser(0L);
         UserDTO userDTO = userService.constructDTOFromEntity(user);
         User userAfterConversion = userService.constructEntityFromDTO(userDTO);
         userAfterConversion.setPasswordHash("passwordHash");
 
-        UserDTO userDTO1 = buildUserDTO(6L);
+        UserDTO userDTO1 = buildUserDTO(0L);
         User user1 = userService.constructEntityFromDTO(userDTO1);
         UserDTO userDTOAfterConversion = userService.constructDTOFromEntity(user1);
         userDTOAfterConversion.setPassword("password");

@@ -20,9 +20,9 @@ public class WeatherController {
 
     private final WeatherApiService weatherApiService;
 
-    @GetMapping("/weather")
+    @GetMapping("/weather/{date}")
     @ResponseStatus(HttpStatus.OK)
-    public WeatherDTO getWeatherOnDay(@RequestParam String date) throws NotFoundException {
+    public WeatherDTO getWeatherOnDay(@PathVariable String date) throws NotFoundException {
         return weatherApiService.getWeatherOnDay(LocalDateTime.of(LocalDate.parse(date), LocalTime.MIDNIGHT));
     }
 

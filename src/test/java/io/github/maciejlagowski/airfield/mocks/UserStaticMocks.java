@@ -39,7 +39,7 @@ public class UserStaticMocks {
         when(repo.save(any(User.class))).then(AdditionalAnswers.returnsFirstArg());
         when(repo.findById(anyLong())).thenAnswer((invocation) -> Optional.of(buildUser(invocation.getArgument(0))));
         when(repo.findByToken(anyString())).thenReturn(Optional.of(buildUser(0L)));
-        when(repo.findByEmail("inactive@mail.com")).thenReturn(Optional.of(buildInactiveUser(0L)));
+        when(repo.findByEmail("inactive@mail.com")).thenReturn(Optional.of(buildInactiveUser()));
         when(repo.findByEmail("abc@mail.com")).thenReturn(Optional.of(buildUser(0L)));
         return repo;
     }
@@ -68,8 +68,8 @@ public class UserStaticMocks {
                 .build();
     }
 
-    private static User buildInactiveUser(Long id) {
-        User user = buildUser(id);
+    private static User buildInactiveUser() {
+        User user = buildUser(0L);
         user.setRole(ERole.ROLE_INACTIVE);
         return user;
     }

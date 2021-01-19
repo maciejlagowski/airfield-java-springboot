@@ -16,9 +16,9 @@ public class EmailController {
 
     private final EmailService emailService;
 
-    @PreAuthorize("hasAnyRole('ADMIN', 'EMPLOYEE')")
     @PostMapping("/email")
     @ResponseStatus(HttpStatus.OK)
+    @PreAuthorize("hasAnyRole('ADMIN', 'EMPLOYEE')")
     public EmailDTO sendEmail(@RequestBody EmailDTO mail) throws MessagingException {
         return emailService.sendFormattedMail(mail);
     }
