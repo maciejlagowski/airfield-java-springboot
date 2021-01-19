@@ -50,15 +50,13 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH"));
         configuration.setAllowCredentials(true);
         configuration.setAllowedHeaders(List.of("Authorization", "Cache-Control", "Content-Type"));
-
         final UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
-
         return source;
     }
 
     @Override
-    public void configure(WebSecurity web) throws Exception {
+    public void configure(WebSecurity web) {
         web.ignoring().antMatchers("/v2/api-docs",
                 "/configuration/ui",
                 "/swagger-resources/**",
@@ -70,7 +68,6 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 "/users/activate",
                 "/users/reset-password",
                 "/weather/alerts"
-//                , "/**" // TODO delete to activate spring security
         );
     }
 
@@ -80,15 +77,6 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .and().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and().authorizeRequests().anyRequest().permitAll()
                 .and().addFilter(new JwtFilter(authenticationManager(), jwtService))
-                .addFilter(new JwtLoginFilter(authenticationManager(), jwtService, userRepository))
-        ;
-
+                .addFilter(new JwtLoginFilter(authenticationManager(), jwtService, userRepository));
     }
-
-//    @Bean
-//    public AuthenticationEntryPoint authenticationEntryPoint() {
-//        return (httpServletRequest, httpServletResponse, error) -> {
-//            System.err.println("error: " + error.getMessage());
-//        };
-//    }
 }

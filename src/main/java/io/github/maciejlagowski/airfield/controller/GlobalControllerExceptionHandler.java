@@ -40,6 +40,5 @@ public class GlobalControllerExceptionHandler {
         if (AirfieldApplication.debug)
             e.printStackTrace();
         httpServletResponse.sendError(500, e.getMessage());
-
     }
 }

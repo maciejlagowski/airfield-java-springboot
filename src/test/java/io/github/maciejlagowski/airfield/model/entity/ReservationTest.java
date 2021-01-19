@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Test;
 
 import java.time.LocalTime;
 
-class ReservationTests {
+class ReservationTest {
 
     @Test
     void shouldCheckReservationCollisions() {

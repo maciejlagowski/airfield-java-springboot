@@ -63,9 +63,9 @@ public class ReservationService {
         );
     }
 
-    public void saveWithHoursCheck(ReservationDTO reservationDTO) {
+    public Reservation saveWithHoursCheck(ReservationDTO reservationDTO) {
         Reservation reservation = createReservation(reservationDTO);
-        reservationRepository.saveWithHoursCheck(reservation);
+        return reservationRepository.saveWithHoursCheck(reservation);
     }
 
     public ReservationDTO blackoutConfidentialData(ReservationDTO reservation) {

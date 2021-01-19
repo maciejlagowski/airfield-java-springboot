@@ -2,11 +2,12 @@ package io.github.maciejlagowski.airfield.controller;
 
 import io.github.maciejlagowski.airfield.exception.UserNotActiveException;
 import io.github.maciejlagowski.airfield.model.dto.UserDTO;
+import io.github.maciejlagowski.airfield.model.entity.User;
 import io.github.maciejlagowski.airfield.model.enumeration.ERole;
 import io.github.maciejlagowski.airfield.model.service.EmailService;
 import io.github.maciejlagowski.airfield.model.service.JwtService;
 import io.github.maciejlagowski.airfield.model.service.UserService;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -18,7 +19,7 @@ import java.util.List;
 
 @RestController
 @CrossOrigin(origins = "http://localhost:4200")
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class UserController {
 
     private final UserService userService;
@@ -27,12 +28,13 @@ public class UserController {
 
     @PostMapping("/users/register")
     @ResponseStatus(HttpStatus.OK)
-    public void register(@RequestBody UserDTO user) throws MessagingException {
+    public User register(@RequestBody UserDTO user) throws MessagingException {
         String token = emailService.generateToken();
         user.setToken(token);
         user.setRole(ERole.ROLE_INACTIVE);
+        User savedUser = userService.save(user);
         emailService.sendActivationLink(user);
-        userService.save(user);
+        return savedUser;
     }
 
     @PreAuthorize("hasAnyRole('ADMIN', 'EMPLOYEE')")
@@ -45,32 +47,32 @@ public class UserController {
     @PutMapping("/users")
     @PreAuthorize("hasAnyRole('USER', 'EMPLOYEE', 'ADMIN')")
     @ResponseStatus(HttpStatus.OK)
-    public void updateUser(@RequestBody UserDTO user, HttpServletRequest request) throws IllegalAccessException {
+    public User updateUser(@RequestBody UserDTO user, HttpServletRequest request) throws IllegalAccessException {
         Long userId = jwtService.getUserIdFromJwt(request.getHeader(HttpHeaders.AUTHORIZATION));
         if (!userService.getRole(request).equals(ERole.ROLE_ADMIN) && !userId.equals(user.getId())) {
             throw new IllegalAccessException("User is trying to update another user");
         }
-        userService.update(user);
+        return userService.update(user);
     }
 
     @PatchMapping("/users")
     @PreAuthorize("hasRole('ADMIN')")
     @ResponseStatus(HttpStatus.OK)
-    public void updateUserRole(@RequestBody UserDTO user) {
-        userService.updateRole(user);
+    public User updateUserRole(@RequestBody UserDTO user) {
+        return userService.updateRole(user);
     }
 
     @DeleteMapping("/users")
     @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
     @ResponseStatus(HttpStatus.OK)
-    public void deleteUser(@RequestParam Long id, HttpServletRequest request) throws IllegalAccessException {
-        if (userService.isRegularUser(request)) {
-            Long userId = jwtService.getUserIdFromJwt(request.getHeader(HttpHeaders.AUTHORIZATION));
+    public Long deleteUser(@RequestParam Long id, HttpServletRequest request) throws IllegalAccessException {
+        Long userId = jwtService.getUserIdFromJwt(request.getHeader(HttpHeaders.AUTHORIZATION));
+        if (userService.isRegularUser(userId)) {
             if (!userId.equals(id)) {
                 throw new IllegalAccessException("User cannot delete another user");
             }
         }
-        userService.deleteById(id);
+        return userService.deleteById(id);
     }
 
     @PreAuthorize("hasAnyRole('ADMIN', 'EMPLOYEE')")
@@ -97,15 +99,16 @@ public class UserController {
 
     @PatchMapping("/users/reset-password")
     @ResponseStatus(HttpStatus.OK)
-    public void sendResetPasswordLink(@RequestParam String email) throws MessagingException {
+    public User sendResetPasswordLink(@RequestParam String email) throws MessagingException {
         String token = emailService.generateToken();
         UserDTO user = userService.getUserByEmail(email);
         if (user.getRole().equals(ERole.ROLE_INACTIVE)) {
             throw new UserNotActiveException(user.getEmail());
         }
         user.setToken(token);
-        userService.update(user);
+        User updatedUser = userService.update(user);
         emailService.sendResetLink(user);
+        return updatedUser;
     }
 
     @GetMapping("/users/reset-password")
