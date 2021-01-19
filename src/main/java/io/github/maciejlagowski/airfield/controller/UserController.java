@@ -32,12 +32,10 @@ public class UserController {
         String token = emailService.generateToken();
         user.setToken(token);
         user.setRole(ERole.ROLE_INACTIVE);
+        User savedUser = userService.save(user);
         emailService.sendActivationLink(user);
-        return userService.save(user);
+        return savedUser;
     }
-
-
-    // TODO zamienic miejscami email z baza danych wszedzie
 
     @PreAuthorize("hasAnyRole('ADMIN', 'EMPLOYEE')")
     @GetMapping("/users")
@@ -108,8 +106,9 @@ public class UserController {
             throw new UserNotActiveException(user.getEmail());
         }
         user.setToken(token);
+        User updatedUser = userService.update(user);
         emailService.sendResetLink(user);
-        return userService.update(user);
+        return updatedUser;
     }
 
     @GetMapping("/users/reset-password")

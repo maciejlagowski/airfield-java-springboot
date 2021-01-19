@@ -61,7 +61,8 @@ public class ReservationController {
                 throw new IllegalAccessException("User cannot modify another user reservation");
             }
         }
+        Long reservationId = reservationStatusService.updateStatus(id, status);
         emailService.sendReservationStatusChangedNotification(status, userToChange);
-        return reservationStatusService.updateStatus(id, status);
+        return reservationId;
     }
 }
