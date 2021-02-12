@@ -1,0 +1,10 @@
+#!/bin/bash
+
+if [ "$1" = "-c" ]; then
+    docker system prune;
+    docker rmi airfield;
+fi
+
+docker build -t airfield .
+
+docker run -p 8080:8080 airfield
